@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <title>Default Landing Page | CryoCore</title>
+        <meta name="viewport" content="initial-scale=1.0,width=device-width"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"/>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid" style="justify-content: center;height:100px;">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#"><img style="height:50px;" src="/public/logo-small.png"></a>
+                </div>    
+            </div>
+        </nav>
+            
+        <div class="container-fluid text-center">    
+            <div class="row content">
+                <div class="col-sm-2 sidenav">
+                    
+                </div>
+                <div class="col-sm-8 text-left" style="text-align: left;"> 
+                    <div style="height:100px;"></div>
+                    <h1 style="font-size:22px;">Rapid IoC PHP Development Framework</h1>
+                    <p>
+                        If you're seeing this page, it means you've correctly setup this framework.
+                    </p>
+                    <div style="height:100px;"></div>
+                    <h2 style="font-size:18px;">Annotation powered framework?</h2>
+                    <p>
+                        I love how Spring MVC used annotations in Java, and wondered why something similar
+                        hasn't been built in PHP, with the world moving to a minimal code approach (and with good reason)
+                        I've decided to build this framework. Power your application with very little and self explanatory code.<br><br>
+
+                        I've also ensured that this framework has little to zero overhead on your application, as frameworks are usually
+                        the likely culprits for sluggish performance. <br><br>
+
+                        Getting started with CryoCore is so easy! If you're seeing this page it means that the controller LandingController.cryo.php 
+                        exists, so you can check the source code there. But just for the sake of showing how simple it is to setup a simple webpage with
+                        CryoCore, I'm going to post below!
+                    </p>
+                    <span class="highlighted-label">src/MyController.cryo.php</span> - Notice the <span class="highlighted-label">.cryo.php</span>? this is essential! 
+                    <br><br>
+                    <pre style="background:#333;color:#fff;padding:20px;">&lt;?php
+    <span class="keyword">namespace</span> App; // important, anything outside this namespace will not be recognised
+
+    <span class="annotation">@Controller </span>
+    <span class="keyword">class</span> MyController {
+
+        <span class="annotation">@Get( path="/home" , produces="application/json" )</span>
+        <span class="keyword">public function</span> showHomepage(){
+            <span class="keyword">return</span> "I Work";
+        }
+    }
+?&gt;</pre>
+                    <p>Now heading to <a href="http://localhost/home">http://localhost/home</a> , you should see a text document saying "I work", this is all that's needed to create a basic controller. Each controller can have multiple routes</p>
+                    <br><br>
+                    <pre style="background:#333;color:#fff;padding:20px;">&lt;?php
+    <span class="keyword">namespace</span> App; // important, anything outside this namespace will not be recognised
+
+    <span class="annotation">@Controller </span>
+    <span class="keyword">class</span> MyController {
+
+        <span class="annotation">@Get( path="/home" , produces="text/text" )</span>
+        <span class="keyword">public function</span> showHomepage(){
+            <span class="keyword">return</span> "I Work";
+        }
+        <span class="annotation">@Get( path="/home/page2" , produces="text/html" )</span>
+        <span class="keyword">public function</span> showHomepage(){
+            <span class="keyword">return</span> "&lt;<span class="html-tag">p</span>&gt;I'm a p tag&lt;/<span class="html-tag">p</span>&gt;";
+        }
+    }
+?&gt;</pre>
+                    <p>All controllers are autoloaded, you don't need to include them or require them. Just add a @Controller annotation and let Cryo do the work!</p>
+                    
+                    <div style="height:100px;"></div>
+                    <h2 style="font-size:18px;">Why use CryoCore?</h2>
+                    <p>
+                        I believe that setting up an API or Application should be much more simple then it is. With other frameworks
+                        you have to make sure you have composer installed any use bulky libraries for primitive functionality, this is
+                        slow and adds a lot of technical debt to your application. <br><br>
+                        I designed this library with minimalism in mind while making sure you've still got tonnes of functionality. I take advantage
+                        of PHP's core mechanisms and caching to ensure lightning fast performance.
+                    </p>
+                </div>
+                <div class="col-sm-2 sidenav">
+                    
+                </div>
+            </div>
+        </div>
+        
+        <footer class="container-fluid text-center">
+            <div style="height:100px;"></div>
+            <div style="height:100px;"></div>
+        </footer>
+  
+    </body>
+    <style>
+        .keyword{
+            color:#00ff6e;
+        }
+        .annotation{
+            color:yellow;
+        }
+        .highlighted-label{
+            padding:5px;
+            background:#cccccc50;
+            border:1px solid #cccccc;
+            font-weight:bold;
+            border-radius:6px;
+            padding-left:12px;
+            padding-right:12px;
+        }
+        .html-tag{
+            color: rgb(255, 0, 76);
+        }
+    </style>
+</html>

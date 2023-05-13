@@ -1,0 +1,5 @@
+<?php
+
+    \Cryo\Mvc::Application();
+
+?>
