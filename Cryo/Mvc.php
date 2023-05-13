@@ -112,6 +112,14 @@
         }
         private static function autowireDependencies($instance , $meta){
             // do nothing for now.
+            // meta is the script definition
+
+            foreach($meta->getProperties() as $property) {
+                if ( $property->hasAnnotation('@Autowired') ) {
+                    
+                }
+            }
+            
         }
         private static function getCryoUserClasses() : array{
             $out = [];

@@ -172,12 +172,16 @@
             $out .= "\t{$this->getClassType()} {$this->getClassName()} ";
 
             if ( $this->getClassType() == 'interface' ) {
-                $out .= 'extends ';
-                foreach($this->getImplements() as $idx => $implement) {
-                    $out .= ($idx > 0 ? " , " : "") . "{$implement} ";
+
+                if ( count($this->getImplements()) > 0 ) { 
+                    $out .= 'extends ';
+                    foreach($this->getImplements() as $idx => $implement) {
+                        $out .= ($idx > 0 ? " , " : "") . "{$implement} ";
+                    }
                 }
             } else {
-                if ( $this->getExtends() !== '' ) {
+                if ( $this->getExtends() !== '') {
+                    
                     $out .= "extends {$this->getExtends()} ";
                 }
                 if ( count($this->getImplements()) > 0 ) {

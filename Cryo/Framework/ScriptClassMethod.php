@@ -27,6 +27,9 @@
         /** @param {String} $returnType - what does this return? */
         private $returnType = 'mixed';
 
+        /** @param {bool} $isInterface - does this method belong to an interface */
+        private $isInterface = false;
+
         /**
          * @param {Annotation} $annotation - the annotation to add.
          * @return {ScriptClassMethod} $self - self reference
@@ -88,7 +91,13 @@
                 $out .= ($idx > 0 ? " , " : "") . $arg->toSource();
             }
 
-            $out .= ") " . ($this->returnType !== 'mixed' ? ': ' . $this->returnType : '') . " { \n";
+            $out .= ") " . ($this->returnType !== 'mixed' ? ': ' . $this->returnType : '');
+            
+            if ( !$this->isAbstract && !$this->isInterface ) {
+                $out .= " { \n";
+            } else {
+                $out .= ";\n";
+            }
             
             foreach($this->arguments as $argument) {
                 $doneAnnots = [];
@@ -100,13 +109,16 @@
                     }
                 }
             }
+            if ( $this->isAbstract || $this->isInterface ) {
+                
+            } else {
+                $out .= "\t\t\t{\n";
+                
+                $out .= str_replace("\n" , "\n\t\t\t" , $this->body);
 
-            $out .= "\t\t\t{\n";
-            
-            $out .= str_replace("\n" , "\n\t\t\t" , $this->body);
-
-            $out .= "\n\t\t\t}\n";
-            $out .= "\n\t\t}\n";
+                $out .= "\n\t\t\t}\n";
+                $out .= "\n\t\t}\n";
+            }
             return str_replace('* /' , '*/' , 
                     str_replace(
                         '/ * *' , 
@@ -128,6 +140,12 @@
             $openParenthesis = 0;
             $args = [];
             $currentArg = [];
+            $lastToken = $tokens[count($tokens) - 1];
+            $isInterface = false;
+            if ( $lastToken == ';' ) {
+                //is interface
+                $isInterface = true;
+            }
             for($i = 2;$i < count($tokens);$i++){
                 $current = $tokens[$i];
 
@@ -184,9 +202,12 @@
                 }
             }
             $inst->annotations = $annotations;
-            $grab = self::extractBody($tokens);
-            $inst->body = implode(" " , $grab['body']);
-            $inst->returnType = $grab['type'];
+            $inst->isInterface = $isInterface;
+            if ( !$isInterface ) {
+                $grab = self::extractBody($tokens);
+                $inst->body = implode(" " , $grab['body']);
+                $inst->returnType = $grab['type'];
+            }
 
             return $inst;
         }

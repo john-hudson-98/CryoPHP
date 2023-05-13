@@ -30,6 +30,44 @@
             $this->type = $type;
             $this->isStatic = $static;
         }
+        /**
+         * @param {Annotation} $annotation - the annotation to add.
+         * @return {ScriptClassProperty} $self - self reference
+         */
+        public function addAnnotation(Annotation $annotation) : ScriptClassProperty {
+            $this->annotations[] = $annotation;
+            return $this;
+        }
+        /**
+         * @param {Array} $annotations - list of annotations the current class has
+         */
+        public function getAnnotations() : array{
+            return $this->annotations;
+        }
+        /**
+         * @param {String} $name - the name of the annotation to check for
+         * @return {bool} - does this class have that annotation
+         */
+        public function hasAnnotation(string $name) : bool {
+            foreach($this->annotations as $annotation) {
+                if ( $annotation->getName() == $name ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /**
+         * @param {String} $name - the name of the annotation to check for
+         * @return {Annotation} - return class
+         */
+        public function getAnnotation(string $name) : ?Annotation {
+            foreach($this->annotations as $annotation) {
+                if ( $annotation->getName() == $name ) {
+                    return $annotation;
+                }
+            }
+            return null;
+        }
         public function getSetterAndSetterSource(){
             $out = '';
             if ( $this->hasSetter ) {
