@@ -116,7 +116,31 @@
 
             foreach($meta->getProperties() as $property) {
                 if ( $property->hasAnnotation('@Autowired') ) {
+                    $target = $property->getType();
                     
+                    // load the class just in case it doesn't exist.
+                    Boilerplate::autoloadClass($target);
+
+                    $class = FrameworkUtils::getClass(substr($target , 1));
+                    
+                    if ( $class ) {
+
+                        $autowired = null;
+                        
+                        if ( $class->hasAnnotation('@Repository') ) {
+                            $repositoryBuilder = new \Cryo\MvcClassExtenders\Repository($target);
+
+                            if ( $repositoryBuilder->exists() ) {
+                                $autowired = $repositoryBuilder->import();
+                            } else {
+                                $repositoryBuilder->buildRepositoryClass();
+
+                            }
+                        }
+
+                    } else {
+                        throw new \Exception("Cannot Autowire class {$target}");
+                    }
                 }
             }
             
