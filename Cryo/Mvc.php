@@ -133,9 +133,19 @@
                             if ( $repositoryBuilder->exists() ) {
                                 $autowired = $repositoryBuilder->import();
                             } else {
-                                $repositoryBuilder->buildRepositoryClass();
-
+                                $autowired = $repositoryBuilder->buildRepositoryClass();
                             }
+                        }
+
+                        if ( $autowired ) {
+                            $obj = new \ReflectionObject($instance);
+                            $propName = substr($property->getName() , 1);
+
+                            $prop = $obj->getProperty($propName);
+                            $prop->setAccessible(true);
+                            $prop->setValue($instance , $autowired);
+                            $prop->setAccessible(false);
+                            
                         }
 
                     } else {

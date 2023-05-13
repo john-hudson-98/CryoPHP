@@ -30,6 +30,9 @@
             $this->type = $type;
             $this->isStatic = $static;
         }
+        public function getName(){
+            return $this->name;
+        }
         /**
          * @param {Annotation} $annotation - the annotation to add.
          * @return {ScriptClassProperty} $self - self reference

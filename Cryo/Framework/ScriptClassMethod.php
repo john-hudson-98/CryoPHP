@@ -75,6 +75,14 @@
             return $this->name;
         }
 
+        public function getArguments() : array{
+            return $this->arguments;
+        }
+
+        public function getReturnType(){
+            return $this->returnType;
+        }
+        
         public function toSource(){
 
             $out = '';
@@ -203,10 +211,18 @@
             }
             $inst->annotations = $annotations;
             $inst->isInterface = $isInterface;
-            if ( !$isInterface ) {
+            if ( !$isInterface && !$inst->isAbstract ) {
                 $grab = self::extractBody($tokens);
                 $inst->body = implode(" " , $grab['body']);
                 $inst->returnType = $grab['type'];
+            } else {
+                //grab return type;
+                for($a = count($tokens);$a > 0;$a--){
+                    if ( $tokens[$a - 1] == ":" ) {
+                        $inst->returnType = $tokens[$a];
+                        break;
+                    }
+                }
             }
 
             return $inst;
