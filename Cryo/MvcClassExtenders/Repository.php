@@ -57,6 +57,10 @@
                         $php .= "\t\t\t\t\$out[] = \$obj;\n";
                         $php .= "\t\t\t}\n";
                         $php .= "\t\t\treturn \$out;";
+                    } else if ( $method->hasAnnotation('@Modifying') ) {
+                        //means this is an update or statement
+                    } else {
+                        throw new \Exception("RepositoryException - custom method must have either @ArrayItem( class={MODEL_NAME} ) or @Modifying");
                     }
 
                     $php .= "\n\t\t}\n";
