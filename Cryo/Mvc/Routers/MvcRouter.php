@@ -29,6 +29,14 @@
             foreach($controller->getMethods() as $method){
                 if ( $method->hasAnnotation('@Route') ) {
                     $route = $method->getAnnotation('@Route');
+
+                    if ( $route->hasValue("allow") ) {
+                        $reqMethods = explode("," , $route->getCleanValue("allow"));
+                        if ( !in_array(strtoupper($_SERVER['REQUEST_METHOD']) , $reqMethods ) ) {
+                            return false;
+                        }
+                    }
+
                     $matching = $this->matchesRoute($route->getCleanValue('path') );
                     if ( $matching['match'] ) {
                         return true;
@@ -55,6 +63,7 @@
 
             foreach($controller->getMethods() as $method) {
                 if ( $method->hasAnnotation('@Route') ) {
+
                     $route = $method->getAnnotation('@Route');
 
                     $matching = $this->matchesRoute($route->getCleanValue('path') );
@@ -70,6 +79,10 @@
 
                         \Cryo\Mvc\RouterService::autowireDependencies($inst , $controller);
 
+                        if ( $method->hasAnnotation('@Layout') ) {
+                            $this->applyLayoutAnnotation($inst , $method->getAnnotation('@Layout') , $controller);
+                        }
+
                         $methodName = $method->getName();
 
                         $resp = $inst->{$methodName}();
@@ -84,6 +97,27 @@
             die();
         }
 
+        private function applyLayoutAnnotation($instance , $annotation , $controller){
+            foreach($controller->getProperties() as $property){
+
+                if ( $property->getType() == '\Cryo\Mvc\Layout' ) {
+                    
+                    $propName = substr($property->getName() , 1);
+
+                    $obj = new \ReflectionObject($instance);
+
+                    $prop = $obj->getProperty($propName);
+                    $prop->setAccessible(true);
+                    $prop->getValue($instance)->setStructure($annotation->getCleanValue("structure"));
+                    $prop->setAccessible(false);
+
+                }
+
+            }
+        }
+        /**
+         * @description - breaks the url & route path down and compares them.
+         */
         private function matchesRoute($path){
             $url = explode("?" , $_SERVER['REQUEST_URI'])[0];
 

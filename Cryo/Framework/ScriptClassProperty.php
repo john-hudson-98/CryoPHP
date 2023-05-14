@@ -78,7 +78,7 @@
                     if ( $this->type == 'mixed' ) {
                         $out .= $this->name;
                     } else {
-                        $out .= '\\' . $this->type . ' ' . $this->name;
+                        $out .= '' . $this->type . ' ' . $this->name;
                     }
                 $out .= "){\n";
                 $out .= "\t\t\t\$this->" . substr($this->name , 1) . " = " . $this->name . ";\n";
@@ -87,7 +87,7 @@
                 $out .= "\t\t}\n";
             }
             if ( $this->hasGetter ) {
-                $out .= "\n\t\tpublic function get" . ucfirst(substr($this->name , 1)) . "() : \\{$this->type} {\n";
+                $out .= "\n\t\tpublic function get" . ucfirst(substr($this->name , 1)) . "() : {$this->type} {\n";
                 $out .= "\t\t\treturn \$this->" . substr($this->name , 1) . ";\n";
 
                 $out .= "\t\t}\n";

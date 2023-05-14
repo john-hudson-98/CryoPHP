@@ -79,12 +79,32 @@
             foreach($meta->getProperties() as $property) {
                 if ( $property->hasAnnotation('@Autowired') ) {
                     $target = $property->getType();
+
+                    if ( $target[0] == '\\' ) {
+                        $target = substr($target , 1);
+                    }
                     
                     // load the class just in case it doesn't exist.
                     \Cryo\Boilerplate::autoloadClass($target);
 
                     if ( substr($target , 0 , 4) == 'Cryo' ) {
-                        return new $target();
+
+                        $target = '\\' . $target;
+
+                        $autowired = new $target();
+
+                        $obj = new \ReflectionObject($instance);
+                        $propName = substr($property->getName() , 1);
+
+                        if ( method_exists($autowired , "onAutowired") ) {
+                            $autowired->onAutowired($property);
+                        }
+
+                        $prop = $obj->getProperty($propName);
+                        $prop->setAccessible(true);
+                        $prop->setValue($instance , $autowired);
+                        $prop->setAccessible(false);
+                        return;
                     }
 
                     $class = \Cryo\FrameworkUtils::getClass($target);
