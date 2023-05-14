@@ -129,17 +129,23 @@
                 $dotenv->load(".env.production");
             }
             if ( $dotenv->get('react.fallback_app') ) {
+                $handled = false;
+                $app = null;
                 foreach($controllers as $controller){
                     if ( $controller->hasAnnotation('@ReactApp') ) {
-                        if ( str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name')) == $dotenv->get('react.fallback_app') ) {
+                        $app = str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name'));
+                        if ($app  == $dotenv->get('react.fallback_app') ) {
                             $local_url = $controller->getAnnotation('@ReactApp')->getValue('local_url');
-                          
-                            \Cryo\Addons\React::serveApp($local_url , str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name')));
+                            $handled = true;
+                            \Cryo\Addons\React::serveApp($local_url , $app);
                         } 
                     }
                 }
+                if ( !$handled ) {
+                    throw new \Exception("React app may exist, but the controller for it doesn't " . $dotenv->get('react.fallback_app'));
+                }
             } else {
-                echo 'No React Fallback App';
+                include_once('Cryo/Defaults/404.html');
             }
         }
         private static function pathMatches($stored , $current){
