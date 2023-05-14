@@ -42,9 +42,7 @@
                 }
             }
             foreach($controllers as $controller) {
-                if ( $controller->hasAnnotation('@ReactApp') ) {
-                    
-                }
+                
                 foreach($controller->getMethods() as $method) {
 
                     if ( $_SERVER['REQUEST_METHOD'] == 'GET' && $method->hasAnnotation('@Get') ) {
@@ -124,43 +122,25 @@
 
                 }
             }
-            foreach($controllers as $controller){
-                if ( $controller->hasAnnotation('@ReactApp') ) {
-                    
-                    //route this one. 
-                    $className = '\\' . $controller->getNamespace() . '\\' . $controller->getClassName();
-
-                    $inst = new $className(); //controllers have no constructors
-
-                    self::autowireDependencies($inst , $controller);
-
-                    foreach($controller->getMethods() as $method) {
-                        if ( $method->getAnnotation('@Get')->getValue('path') == '"/"' ) {
-                            $call = $method->getName();
-
-                            $headers = array();
-
-                            // go ahead and call the function, but first we need to get the arguments
-                            $resp = $inst->{$call}();
-
-                            foreach($headers as $header => $value){
-                                header("{$header}: {$value}");
-                            }
-
-                            if ( is_array($resp) ) {
-                                die(json_encode($resp));
-                            } 
-                            if ( is_object($resp) ) {
-                                if ( method_exists($resp , 'serialize') ) {
-                                    die(json_encode($resp->serialize()));
-                                }
-                                die(json_encode($resp));
-                            }
-                            die(strval($resp));
-                            
-                        }
+            $dotenv = new \Cryo\Parsers\DotEnv();
+            if ( $_SERVER['SERVER_NAME'] == 'localhost' ) {
+                $dotenv->load(".env.local");
+            } else {
+                $dotenv->load(".env.production");
+            }
+            if ( $dotenv->get('react.fallback_app') ) {
+                foreach($controllers as $controller){
+                    if ( $controller->hasAnnotation('@ReactApp') ) {
+                        if ( str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name')) == $dotenv->get('react.fallback_app') ) {
+                            $local_url = $controller->getAnnotation('@ReactApp')->getValue('local_url');
+                            $asset_manifest = $controller->getAnnotation('@ReactApp')->getValue('asset_manifest');
+                          
+                            \Cryo\Addons\React::serveApp($local_url , $asset_manifest);
+                        } 
                     }
                 }
+            } else {
+                echo 'No React Fallback App';
             }
         }
         private static function pathMatches($stored , $current){
