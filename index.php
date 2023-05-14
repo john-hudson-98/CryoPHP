@@ -13,7 +13,9 @@
 
     \Cryo\Boilerplate::registerAutoloader();
 
-
+    if ( !file_exists('src/index.php') ) {
+        file_put_contents("src/index.php" , "<?php \Cryo\Mvc::Application(); ?>");
+    }
     require_once('src/index.php');
 
 ?>

@@ -42,6 +42,9 @@
                 }
             }
             foreach($controllers as $controller) {
+                if ( $controller->hasAnnotation('@ReactApp') ) {
+                    
+                }
                 foreach($controller->getMethods() as $method) {
 
                     if ( $_SERVER['REQUEST_METHOD'] == 'GET' && $method->hasAnnotation('@Get') ) {
@@ -79,11 +82,86 @@
                             }
                             die(strval($resp));
                         }
+                    } else if ( $_SERVER['REQUEST_METHOD'] == 'POST' && $method->hasAnnotation('@Post') ) {
+                        //has the annotation, now we just check the annotation value.
+                        $className = '\\' . $controller->getNamespace() . '\\' . $controller->getClassName();
+
+                        $inst = new $className(); //controllers have no constructors
+
+                        self::autowireDependencies($inst , $controller);
+
+                        $call = $method->getName();
+
+                        $post = Boilerplate::createAnnotation($method->getAnnotation('@Post') , '\\Cryo\Mvc\\');
+
+                        if ( $post->consumes() !== $_SERVER['CONTENT_TYPE'] ) {
+                            die(json_encode(array('error' => 'Invalid Post Type, expected ' . $post->consumes())));
+                        }
+
+                        if ( self::pathMatches($post->path() , $_SERVER['REQUEST_URI']) ) {
+                            $headers = array();
+                            $headers['Content-Type'] = $get->produces();
+
+                            // go ahead and call the function, but first we need to get the arguments
+                            $resp = $inst->{$call}();
+
+                            foreach($headers as $header => $value){
+                                header("{$header}: {$value}");
+                            }
+
+                            if ( is_array($resp) ) {
+                                die(json_encode($resp));
+                            } 
+                            if ( is_object($resp) ) {
+                                if ( method_exists($resp , 'serialize') ) {
+                                    die(json_encode($resp->serialize()));
+                                }
+                                die(json_encode($resp));
+                            }
+                            die(strval($resp));
+                        }
                     }
 
                 }
             }
-            die("404, not found");
+            foreach($controllers as $controller){
+                if ( $controller->hasAnnotation('@ReactApp') ) {
+                    
+                    //route this one. 
+                    $className = '\\' . $controller->getNamespace() . '\\' . $controller->getClassName();
+
+                    $inst = new $className(); //controllers have no constructors
+
+                    self::autowireDependencies($inst , $controller);
+
+                    foreach($controller->getMethods() as $method) {
+                        if ( $method->getAnnotation('@Get')->getValue('path') == '"/"' ) {
+                            $call = $method->getName();
+
+                            $headers = array();
+
+                            // go ahead and call the function, but first we need to get the arguments
+                            $resp = $inst->{$call}();
+
+                            foreach($headers as $header => $value){
+                                header("{$header}: {$value}");
+                            }
+
+                            if ( is_array($resp) ) {
+                                die(json_encode($resp));
+                            } 
+                            if ( is_object($resp) ) {
+                                if ( method_exists($resp , 'serialize') ) {
+                                    die(json_encode($resp->serialize()));
+                                }
+                                die(json_encode($resp));
+                            }
+                            die(strval($resp));
+                            
+                        }
+                    }
+                }
+            }
         }
         private static function pathMatches($stored , $current){
             $current = str_replace(['///' , '//'] , '/' , str_replace('?' . $_SERVER['QUERY_STRING'] , '' , $current));
@@ -97,18 +175,20 @@
             if ( $current == $stored . "/" ) {
                 return true;
             }
-
-            $stored = preg_quote($stored, '/');
+            if ( preg_match($stored , $current) ) {
+                return true;
+            }
+            $matchUrl = preg_quote($stored, '/');
     
-            // Replace wildcards with regex patterns
-            $stored = str_replace('\*', '([^/]+)', $stored);
-            $stored = preg_replace('/\\\{([^\/]+)\\\}/', '([^/]+)', $stored);
+            // Replace * with regex pattern for any character except newline
+            $matchUrl = str_replace('\*', '.*', $matchUrl);
             
-            // Add regex delimiters and case-insensitive flag
-            $stored = '#^' . $stored . '$#i';
+            // Add regex delimiters
+            $regex = '/^' . $matchUrl . '$/';
             
-            // Match the current URL against the stored URL pattern
-            return preg_match($stored, $current);
+            // Test if requestUrl matches regex
+            return preg_match($regex, $current);
+            // return true;
         }
         private static function autowireDependencies($instance , $meta){
             // do nothing for now.

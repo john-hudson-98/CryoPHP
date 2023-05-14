@@ -11,6 +11,10 @@
         public static function getClass(string $className){
             return self::$CLASS_REGISTRY[$className];
         }
+        public static function dumpRegistry(){
+            echo '<pre>';
+            var_dump(self::$CLASS_REGISTRY);
+        }
     }
 
 ?>
