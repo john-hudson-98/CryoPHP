@@ -42,6 +42,11 @@
                 }
             }
             foreach($controllers as $controller) {
+
+                if ( $controller->hasAnnotation('@ReactApp') ) {
+
+                    // figure out react micro app routing pattern
+                }
                 
                 foreach($controller->getMethods() as $method) {
 
@@ -160,7 +165,7 @@
             if ( $current == $stored . "/" ) {
                 return true;
             }
-            if ( preg_match($stored , $current) ) {
+            if ( @preg_match($stored , $current) ) {
                 return true;
             }
             $matchUrl = preg_quote($stored, '/');
