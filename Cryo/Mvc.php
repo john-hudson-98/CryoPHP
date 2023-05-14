@@ -133,9 +133,8 @@
                     if ( $controller->hasAnnotation('@ReactApp') ) {
                         if ( str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name')) == $dotenv->get('react.fallback_app') ) {
                             $local_url = $controller->getAnnotation('@ReactApp')->getValue('local_url');
-                            $asset_manifest = $controller->getAnnotation('@ReactApp')->getValue('asset_manifest');
                           
-                            \Cryo\Addons\React::serveApp($local_url , $asset_manifest);
+                            \Cryo\Addons\React::serveApp($local_url , str_replace('"' , '' , $controller->getAnnotation('@ReactApp')->getValue('app_name')));
                         } 
                     }
                 }
