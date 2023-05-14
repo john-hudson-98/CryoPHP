@@ -53,7 +53,12 @@ I've added support for react apps, you can have many micro-apps if necessary sim
 
 When you use `npm run build` in `create-react-app` copy and paste the contents of the build directory (not the build directory itself, but its descendents) into YOUR_APP_NAME directory.
 
-If you want to fallback to a React App (Lets say you have 1), you can use
+If you want to fallback to a React App (Lets say you have 1), in your .env.local or .env.production file, add this line:
+```
+react.fallback_app="YOUR_APP_NAME"
+```
+
+This will autoroute your react app. 
 
 These are the basics, I will be adding a lot more functionality to this, here is a template .gitignore file for your projects:
 ```
