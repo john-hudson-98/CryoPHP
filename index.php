@@ -8,6 +8,7 @@
     @mkdir("src");
     @mkdir("Plugins");
 
+    $GLOBALS['startTime'] = microtime(true);
 
     require_once('Cryo/Boilerplate.php');
 

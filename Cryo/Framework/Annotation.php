@@ -35,6 +35,12 @@
         public function getValue($key){
             return $this->attributes[$key];
         }
+        public function hasValue($key){
+            return isset($this->attributes[$key]);
+        }
+        public function getCleanValue($key){
+            return str_replace('"' , '' , $this->attributes[$key]);
+        }
         public function toCommentSpec(){
             return "/** {$this->name}(" . str_replace('*/' , '*\/' , implode(" , " , $this->attributes)) . ") **/";
         }

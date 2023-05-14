@@ -9,7 +9,7 @@
             self::$CLASS_REGISTRY[$className] = $definition;
         }
         public static function getClass(string $className){
-            return self::$CLASS_REGISTRY[$className];
+            return @self::$CLASS_REGISTRY[$className];
         }
         public static function dumpRegistry(){
             echo '<pre>';

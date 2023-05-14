@@ -3,10 +3,10 @@
     namespace Cryo\Addons;
 
     class React {
-        public static function serveApp($localUrl ,  $appName , $pageName = null) {
+        public static function serveApp($localUrl ,  $appName , $url = "") {
             $pageName = ucfirst($appName);
             if ( $_SERVER['SERVER_NAME'] == 'localhost' && !file_exists("public/reactapps/" . $appName) ) {
-                self::serveLocal(str_replace('"' , '' , $localUrl));
+                self::serveLocal($localUrl , $url);
             } else {
                 if ( file_exists("public/reactapps/" . $appName) ) {
                     //load local.
@@ -47,12 +47,12 @@
                 die($tpl);
             }
         }
-        private static function serveLocal($localUrl){
+        private static function serveLocal($localUrl , $url){
             $ch = curl_init();
             curl_setopt_array($ch , array(
                 CURLOPT_RETURNTRANSFER => 1 , 
                 CURLOPT_FOLLOWLOCATION => 1 , 
-                CURLOPT_URL => $localUrl . $_SERVER['REQUEST_URI'] , 
+                CURLOPT_URL => $localUrl . $url , 
                 CURLOPT_HEADER => 1
             ));
             // echo $localUrl . $_SERVER['REQUEST_URI'];

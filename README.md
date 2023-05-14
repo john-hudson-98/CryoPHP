@@ -41,13 +41,17 @@ I've added support for react apps, you can have many micro-apps if necessary sim
     namespace App\Controllers;
 
     @Controller 
-    @ReactApp( app_name="YOUR_APP_NAME" , local_url="http://localhost:3000" )
+    @ReactApp( app_name="appname" , local_url="http://localhost:3000")
+    @ReactRoute( match_type="starts_with" , value="/appname/" , mapsTo="/appname/")
     class Portfolio {
         
     }
 
 ?>
 ```
+Note: `mapsTo` allows you to map to a react app when using `npm start` on create-react-app.
+make sure this matches what's in your package.json -> "homepage" value.
+
 `local_url` is used for local development, you can use this inline with create-react-app. 
 `app_name` maps directly to `/public/reactapps/YOUR_APP_NAME` it loads the resources automatically.
 
