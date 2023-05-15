@@ -110,7 +110,24 @@
             die();
         }
         private function isAuthorized($annotation){
+            // add logic
+
+            if ( !$annotation->hasValue('authorizer') ) {
+                throw new \Exception("No Authorizer to check against, Use @Protected( authorizer=\App\PathToClass , loginUrl=\"/login\"");
+            }
+
+            $authorizer = $annotation->getCleanValue('authorizer');
+            $implements = class_implements($authorizer);
+            if ( count($implements) < 1 ) {
+                throw new \Exception("No Authorizer to check against, The supplied Authorizer doesn't implement \\Cryo\\Security\\Authorizer");
+            }
+            if ( !in_array('Cryo\\Security\\Authorizer' , $implements) ) {
+                throw new \Exception("No Authorizer to check against, The supplied Authorizer doesn't implement \\Cryo\\Security\\Authorizer");
+            }
             
+            $inst = new $authorizer();
+
+            return $inst->authorize();
         }
         private function applyLayoutAnnotation($instance , $annotation , $controller){
             foreach($controller->getProperties() as $property){
