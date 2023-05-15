@@ -39,11 +39,50 @@
                     return false;
                 case "equals":
                     return $url == $value || stristr($url . 'static' , $value);
+                case "matches_regex":
+                    $resp = preg_match($value , $url);
+
+                    if ( !$resp ) {
+                        //check exact match.
+
+                        $exact = $route->hasValue('or_equal_to') ? $route->getCleanValue('or_equal_to') : false;
+
+                        if ( $exact == $url ) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return true;
                 default:
                     return false;
             }
         }
         public function route(string $url , $controller) {
+
+            if ( stristr($url , 'static') ) {
+                //put a header in there
+
+                $filename = basename($url);
+                $ext = substr($filename , strrpos($filename , '.') + 1);
+                $contentType = "text/";
+                switch($ext){
+                    case "css":
+                        $contentType .= "css";
+                    break;
+                    case "js":
+                        $contentType .= "javascript";
+                    break;
+                    case "png":
+                    case "jpg":
+                    case "jpeg":
+                    case "gif":
+                        $contentType = 'image/' . $ext;
+                    break;
+                }
+                header("Content-Type: " . $contentType);
+
+            }   
+
             $route = $controller->getAnnotation('@ReactRoute');
             $value = $route->getCleanValue('value');
             $mapTo = $route->getCleanValue('mapsTo');

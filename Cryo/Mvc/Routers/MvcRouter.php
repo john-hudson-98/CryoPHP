@@ -71,6 +71,12 @@
                     if ( $matching['match'] ) {
                         // already matched, but we need path variables.
 
+                        if ( $controller->hasAnnotation('@Protected') ) {
+                            if ( !self::isAuthorized($controller->getAnnotation('@Protected')) ) {
+                                header("Location: " . $controller->getAnnotation('@Protected')->getCleanValue('loginUrl'));
+                            }
+                        }
+
                         $_SERVER['PATH_VARIABLES'] = $matching['variables'];
 
                         $cname = '\\' . $controller->getNamespace() . '\\' . $controller->getClassName();
@@ -96,7 +102,9 @@
 
             die();
         }
-
+        private function isAuthorized($annotation){
+            
+        }
         private function applyLayoutAnnotation($instance , $annotation , $controller){
             foreach($controller->getProperties() as $property){
 
