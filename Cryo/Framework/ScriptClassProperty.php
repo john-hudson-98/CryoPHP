@@ -107,7 +107,7 @@
             if ( $this->hasGetter ) {
                 $source .= "\n\t\t/** @Getter **/";
             }
-            $source .= "\n\t\t" . $this->visibility . " " . $this->name . "";
+            $source .= "\n\t\t" . $this->visibility . ($this->isStatic ? ' static ' : '') . " " . $this->name . "";
 
             if ( $this->value !== '' ) {
                 $source .= " = {$this->value}";

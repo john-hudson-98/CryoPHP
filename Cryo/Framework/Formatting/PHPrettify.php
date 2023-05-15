@@ -13,7 +13,7 @@
                 }
                 $out[] = $this->performModifications($line , @$lines[$idx - 1] , substr_count($lines[$idx - 1] , "\t"));
             }
-            return "\n" . $this->fixArrows(implode("\n" , $out)) . "\n";
+            return "\n" . $this->fixDoubleColons($this->fixArrows(implode("\n" , $out))) . "\n";
         }
         private function performModifications($line , $previousLine , $previousLineTabs = 0) {
             if ( 
@@ -33,6 +33,9 @@
             $arrArrow = str_replace("= >" , "=>" , $str);
             $arrCall = str_replace('- >' , '->' , $arrArrow);
             return $arrCall;
+        }
+        private function fixDoubleColons($code){
+            return str_replace(';;' , ';' , $code);
         }
     }
 

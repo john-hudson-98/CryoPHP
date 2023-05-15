@@ -86,7 +86,7 @@
                     
                     // load the class just in case it doesn't exist.
                     \Cryo\Boilerplate::autoloadClass($target);
-
+                    
                     if ( substr($target , 0 , 4) == 'Cryo' ) {
 
                         $target = '\\' . $target;
@@ -95,7 +95,7 @@
 
                         $obj = new \ReflectionObject($instance);
                         $propName = substr($property->getName() , 1);
-
+                        self::autowireDependencies($autowired , $class);
                         if ( method_exists($autowired , "onAutowired") ) {
                             $autowired->onAutowired($property);
                         }
@@ -121,11 +121,14 @@
                             } else {
                                 $autowired = $repositoryBuilder->buildRepositoryClass();
                             }
+                        } else {
+                            $autowired = new $target();
                         }
-
+                        
                         if ( $autowired ) {
                             $obj = new \ReflectionObject($instance);
                             $propName = substr($property->getName() , 1);
+                            self::autowireDependencies($autowired , $class);
 
                             if ( method_exists($autowired , "onAutowired") ) {
                                 $autowired->onAutowired($property);
