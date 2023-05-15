@@ -2,3 +2,4 @@
 /var/*
 .env.*
 src/*
+public/website_main

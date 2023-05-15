@@ -37,6 +37,8 @@
                         return true;
                     }
                     return false;
+                case "equals":
+                    return $url == $value || stristr($url . 'static' , $value);
                 default:
                     return false;
             }

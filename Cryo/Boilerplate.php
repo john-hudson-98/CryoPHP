@@ -35,11 +35,19 @@
 
                     $cacheName = $cacheDir . '/' . sha1($lookPath) . '.php';
 
-                    // if ( file_exists($cacheName) ) {
-                    //     require_once($cacheName);
-                    //     $meta = unserialize(file_get_contents(str_replace('.php' , '.meta.obj' , $cacheName)));
-                    //     FrameworkUtils::registerClass($script->getNamespace() . '\\' . $script->getClassName() , $meta);
-                    // }
+                    
+
+                    if ( file_exists($cacheName) ) {
+
+                        if ( self::cacheValid($lookPath , $cacheName) ) {
+
+                            require_once($cacheName);
+                            $meta = unserialize(file_get_contents(str_replace('.php' , '.meta.obj' , $cacheName)));
+                            FrameworkUtils::registerClass($meta->getNamespace() . '\\' . $meta->getClassName() , $meta);
+                            //load from cache
+                            return;
+                        }
+                    }
                     
                     // parse Alternate PHP and convert it back to pure PHP
 
@@ -85,6 +93,16 @@
 
             return Framework\AnnotationClassBuilder::fromInterface($cname , $annotation);
         }
+
+        private static function cacheValid($file, $cachedFile) {
+            // get the modification time of the file and cached file
+            $fileModTime = filemtime($file);
+            $cachedFileModTime = filemtime($cachedFile);
+            
+            // compare the modification times and return the result
+            return $cachedFileModTime >= $fileModTime;
+        }
+        
     }
 
 ?>

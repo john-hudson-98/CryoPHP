@@ -34,8 +34,14 @@
             return null;
         }
         public function render(){
-            $tplDir = 'src/theme/' . Layout::$theme . '/template/' . $this->getTemplate();
-
+            
+            $tplDir;
+            
+            if ( substr($this->getTemplate() , 0 , strlen("shared://")) == "shared://" ) {
+                $tplDir = str_replace('shared://' , 'src/theme/shared/' , $this->getTemplate());    
+            } else {
+                $tplDir = 'src/theme/' . Layout::$theme . '/template/' . $this->getTemplate();
+            }
             if ( !file_exists($tplDir) ) {
                 echo 'Missing theme file: ' . $tplDir;
                 return;
