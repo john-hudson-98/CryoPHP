@@ -75,7 +75,6 @@
         public static function autowireDependencies($instance , $meta){
             // do nothing for now.
             // meta is the script definition
-
             foreach($meta->getProperties() as $property) {
                 if ( $property->hasAnnotation('@Autowired') ) {
                     $target = $property->getType();
@@ -95,7 +94,7 @@
 
                         $obj = new \ReflectionObject($instance);
                         $propName = substr($property->getName() , 1);
-                        self::autowireDependencies($autowired , $class);
+                        // self::autowireDependencies($autowired , $class);
                         if ( method_exists($autowired , "onAutowired") ) {
                             $autowired->onAutowired($property);
                         }
@@ -128,7 +127,7 @@
                         if ( $autowired ) {
                             $obj = new \ReflectionObject($instance);
                             $propName = substr($property->getName() , 1);
-                            self::autowireDependencies($autowired , $class);
+                            // self::autowireDependencies($autowired , $class);
 
                             if ( method_exists($autowired , "onAutowired") ) {
                                 $autowired->onAutowired($property);
