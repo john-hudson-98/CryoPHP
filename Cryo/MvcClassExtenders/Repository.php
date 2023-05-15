@@ -21,13 +21,26 @@
             return new $cname();
         }
         public function buildRepositoryClass(){
-            $iface = \Cryo\FrameworkUtils::getClass(substr($this->interface , 1));
+
+            \Cryo\Boilerplate::autoloadClass($this->interface);
+
+            $iface = \Cryo\FrameworkUtils::getClass($this->interface);
             
             $php = '<?php' . PHP_EOL . PHP_EOL;
-            $php .= "\tnamespace " . substr($this->interface , 1) . ";\n\n";
+            $php .= "\tnamespace " . $this->interface. ";\n\n";
 
-            $php .= "\tclass Definition extends \\Cryo\\Framework\\Data\\BaseRepository implements {$this->interface} {\n";
+            $php .= "\tclass Definition extends \\Cryo\\Framework\\Data\\BaseRepository implements \\{$this->interface} {\n";
+            
+            $php .= "\tpublic function install(){\n";
+            
+            if ( $iface->getAnnotation('@Repository')->hasValue('install') ) {
+                $php .= "\t\t\$this->getDatabaseAdapter()->query(file_get_contents('src/" . $iface->getAnnotation('@Repository')->getCleanValue("install") . "'));\n";
+            } else {
+                throw new \Exception("RepositoryException - @Repository annotation missing install attribute");
+            }
 
+            $php .= "\t}\n";
+            
             foreach($iface->getMethods() as $method){
                 if ( $method->hasAnnotation('@Query') ) {
                     $php .= "\t\tpublic function {$method->getName()}(";
@@ -45,22 +58,28 @@
 
                     $php .= "\t\t\t\$db = \$this->getDatabaseAdapter();\n";
                     $php .= "\t\t\t\$res = \$db->query({$method->getAnnotation('@Query')->getValue('value')});\n";
-                        
+                    
+                    if ( $method->getReturnType() == 'int' ) {
+                        //returns an int.
 
-                    if ( $method->hasAnnotation('@ArrayItem') ) {
-                        $targetItem = $method->getAnnotation('@ArrayItem')->getValue('class');
-
-                        $php .= "\t\t\t\$out = [];\n";
-                        $php .= "\t\t\tforeach(\$res as \$item){ \n";
-                        $php .= "\t\t\t\t\$obj = new \\{$targetItem}();\n";
-                        $php .= "\t\t\t\t\$obj->assign(\$item);\n";
-                        $php .= "\t\t\t\t\$out[] = \$obj;\n";
-                        $php .= "\t\t\t}\n";
-                        $php .= "\t\t\treturn \$out;";
-                    } else if ( $method->hasAnnotation('@Modifying') ) {
-                        //means this is an update or statement
+                        $php .= "\t\t\treturn isset(\$res[0]) ? array_values(\$res[0])[0] : 0;\n";
                     } else {
-                        throw new \Exception("RepositoryException - custom method must have either @ArrayItem( class={MODEL_NAME} ) or @Modifying");
+
+                        if ( $method->hasAnnotation('@ArrayItem') ) {
+                            $targetItem = $method->getAnnotation('@ArrayItem')->getValue('class');
+
+                            $php .= "\t\t\t\$out = [];\n";
+                            $php .= "\t\t\tforeach(\$res as \$item){ \n";
+                            $php .= "\t\t\t\t\$obj = new \\{$targetItem}();\n";
+                            $php .= "\t\t\t\t\$obj->assign(\$item);\n";
+                            $php .= "\t\t\t\t\$out[] = \$obj;\n";
+                            $php .= "\t\t\t}\n";
+                            $php .= "\t\t\treturn \$out;";
+                        } else if ( $method->hasAnnotation('@Modifying') ) {
+                            //means this is an update or statement
+                        } else {
+                            throw new \Exception("RepositoryException - custom method must have either @ArrayItem( class={MODEL_NAME} ) or @Modifying");
+                        }
                     }
 
                     $php .= "\n\t\t}\n";
@@ -76,7 +95,7 @@
 
             require_once($this->targetFile);
 
-            $cname = $this->interface . "\\Definition";
+            $cname = '\\' . $this->interface . "\\Definition";
 
             return new $cname();
         }

@@ -197,8 +197,30 @@
                 
                 $out .= "\n";
             }
-
             foreach($this->getMethods() as $method){
+                if ( $method->getName() == '__construct' ) {
+
+                    $out .= "\t\tpublic function __construct(";
+
+                    foreach($method->getArguments() as $idx => $arg) {
+                        $out .= ($idx > 0 ? " , " : "") . $arg->toSource();
+                    }
+
+                    $out .= "){\n";
+                        
+                    $out .= "\t\t\t\Cryo\FrameworkUtils::applyAnnotations(\$this);\n";
+                    $out .= "\t\t\t\$this->{$this->getClassName()}(";
+                    
+                    foreach($method->getArguments() as $idx => $arg) {
+                        $out .= ($idx > 0 ? " , " : "") . $arg->getName();
+                    }
+
+                    $out .= ");\n";
+
+                    $out .= "\t\t}\n";
+
+                    $method->rename($this->getClassName());
+                }
                 $out .= $method->toSource();
             }
             

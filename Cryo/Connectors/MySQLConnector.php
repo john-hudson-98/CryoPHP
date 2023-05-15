@@ -16,9 +16,21 @@
         }
         public function query(string $query , array $binds = []) : array{
             foreach($binds as $key => $val){
-                $query = str_replace(':' . $key . ':' , "'{$this->resource->real_escape_string($val)}'" , $query);
+                if ( is_null($val) ) {
+                    $query = str_replace(':' . $key . ':' , "NULL" , $query);
+                } else {
+                    $query = str_replace(':' . $key . ':' , "'{$this->resource->real_escape_string($val)}'" , $query);
+                }
             }
-            $resp = $this->resource->query($query);
+            try{
+                $resp = $this->resource->query($query);
+            }catch(\Exception $e){
+                throw new \Exception("MySQLConnector::Exception {$e->getMessage()}, your query was: {$query}");
+            }
+
+            if ( !$resp ) {
+                throw new \Exception("MySQLConnector::Exception {$this->resource->error}, your query was: {$query}");
+            }
 
             if ( @$resp->num_rows ) {
                 $out = [];
@@ -26,6 +38,9 @@
                     $out[] = $row;
                 }
                 return $out;
+            }
+            if ( $resp === true ) {
+                return [];
             }
             return json_decode(json_encode($resp) , true);
         }
@@ -47,7 +62,10 @@
                 throw new \Exception("Missing environment variable in dotenv: mysql.schema (A.K.A database)");
             }
 
-            $this->resource = new \mysqli($dot->get("mysql.host") , $dot->get("mysql.user") , $dot->get("mysql.password") , $dot->get("mysql.schema"));
+            $this->resource = new \mysqli($dot->get("mysql.host") , $dot->get("mysql.user") , $dot->get("mysql.password"));
+
+            $this->resource->query("CREATE DATABASE IF NOT EXISTS `{$dot->get("mysql.schema")}`");
+            $this->resource->select_db($dot->get("mysql.schema"));
 
             
         }

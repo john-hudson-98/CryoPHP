@@ -15,6 +15,11 @@
             echo '<pre>';
             var_dump(self::$CLASS_REGISTRY);
         }
+        public static function applyAnnotations($instance){
+            $def = self::getClass(get_class($instance));
+
+            
+        }
     }
 
 ?>

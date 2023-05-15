@@ -33,7 +33,7 @@
             return $this->attributes;
         }
         public function getValue($key){
-            return $this->attributes[$key];
+            return @$this->attributes[$key];
         }
         public function hasValue($key){
             return isset($this->attributes[$key]);
@@ -44,9 +44,9 @@
         public function toCommentSpec(){
             return "/** {$this->name}(" . str_replace('*/' , '*\/' , implode(" , " , $this->attributes)) . ") **/";
         }
-        public static function apply($annotationName , $attributes , $initialValue){
+        public static function apply($annotationName , $attributes , $initialValue , $type = ''){
             if ( @self::$Modifiers[$annotationName] ) {
-                $initialValue = self::$Modifiers[$annotationName]($initialValue , json_decode($attributes , true));
+                $initialValue = self::$Modifiers[$annotationName]($initialValue , json_decode($attributes , true) , $type);
                 return $initialValue;
             }
             return $initialValue;

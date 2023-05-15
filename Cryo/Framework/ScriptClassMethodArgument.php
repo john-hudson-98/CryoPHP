@@ -22,6 +22,9 @@
         public function getName(){
             return $this->argumentName;
         }
+        public function getType() : string{
+            return $this->datatype;
+        }
 
         /**
          * @param {Annotation} $annotation - the annotation to add.

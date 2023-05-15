@@ -30,6 +30,11 @@
         /** @param {bool} $isInterface - does this method belong to an interface */
         private $isInterface = false;
 
+        public function rename(string $newName) : ScriptClassMethod {
+            $this->name = $newName;
+            return $this;
+        }
+
         /**
          * @param {Annotation} $annotation - the annotation to add.
          * @return {ScriptClassMethod} $self - self reference
@@ -112,7 +117,7 @@
                 foreach($argument->getAnnotations() as $annotation){
                     if ( !in_array($annotation->getName() , $doneAnnots) ) {
                         $cname = str_replace('@' , '' , $annotation->getName());
-                        $out .= "\t\t\t{$argument->getName()} = \Cryo\Framework\Annotation::apply('{$cname}' , '" . json_encode($annotation->getAttributes()) . "' , {$argument->getName()});\n";
+                        $out .= "\t\t\t{$argument->getName()} = \Cryo\Framework\Annotation::apply('{$cname}' , '" . json_encode($annotation->getAttributes()) . "' , {$argument->getName()} , '{$argument->getType()}');\n";
                         $doneAnnots[] = $annotation->getName();
                     }
                 }

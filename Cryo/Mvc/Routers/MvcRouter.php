@@ -33,7 +33,7 @@
                     if ( $route->hasValue("allow") ) {
                         $reqMethods = explode("," , $route->getCleanValue("allow"));
                         if ( !in_array(strtoupper($_SERVER['REQUEST_METHOD']) , $reqMethods ) ) {
-                            return false;
+                            continue;
                         }
                     }
 
@@ -74,6 +74,13 @@
                         if ( $controller->hasAnnotation('@Protected') ) {
                             if ( !self::isAuthorized($controller->getAnnotation('@Protected')) ) {
                                 header("Location: " . $controller->getAnnotation('@Protected')->getCleanValue('loginUrl'));
+                            }
+                        }
+
+                        if ( $route->hasValue("allow") ) {
+                            $reqMethods = explode("," , $route->getCleanValue("allow"));
+                            if ( !in_array(strtoupper($_SERVER['REQUEST_METHOD']) , $reqMethods ) ) {
+                                continue;
                             }
                         }
 
