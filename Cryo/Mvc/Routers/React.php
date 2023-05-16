@@ -31,6 +31,7 @@
             }
             $route = $controller->getAnnotation('@ReactRoute');
             $value = $route->getCleanValue('value');
+
             switch($route->getCleanValue('match_type')) {
                 case "starts_with":
                     if ( substr($url , 0 , strlen( $value )) == $value ) {
