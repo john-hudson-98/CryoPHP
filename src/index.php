@@ -1,1 +1,5 @@
-<?php \Cryo\Mvc::Application(); ?>
+<?php 
+
+    \Cryo\Mvc::Application(); 
+    
+?>

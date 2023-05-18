@@ -24,6 +24,12 @@
 
             switch($codespace){
                 case "App":
+                    $noCodepool = str_replace('App\\' , '' , $className);
+                    if ( self::isYamlDefinition($noCodepool) ) {
+                        self::loadYamlClass($noCodepool);
+                        return;
+                    }
+
                     $lookPath = 'src/' . str_replace('App/' , '' , str_replace('\\' , '/' , $className)) . '.cryo.php';
 
                     if ( !file_exists($lookPath) ) {
@@ -48,7 +54,6 @@
                             return;
                         }
                     }
-                    
                     // parse Alternate PHP and convert it back to pure PHP
 
                     $file = file_get_contents($lookPath);
@@ -102,7 +107,35 @@
             // compare the modification times and return the result
             return $cachedFileModTime >= $fileModTime;
         }
-        
+
+        private static function isYamlDefinition($className) : bool{
+            
+            if ( file_exists('src/' . (str_replace('\\' , '/' , $className) . '.yml')) ) {
+                return true;
+            }
+            if ( file_exists('src/' . (str_replace('\\' , '/' , $className) . '.yaml')) ) {
+                return true;
+            }
+            return false;
+        }
+        private static function loadYamlClass($className) {
+            $path = 'src/' . str_replace('\\' , '/' , $className);
+
+            if ( file_exists($className . '.yml') ) {
+                $path .= ".yml";
+            } else {
+                $path .= ".yaml";
+            }
+
+            $builder = new \Cryo\Framework\YamlClassBuilder($path);
+            
+            if ( $builder->isCached() ) {
+                $builder->import();
+            } else {
+                $builder->build();
+                $builder->import();
+            }
+        }
     }
 
 ?>
