@@ -105,8 +105,9 @@
                 $entity = $repo->getCleanValue('entity');
                 $cname = $entity;
 
-                \Cryo\Boilerplate::autoloadClass($entity);
-                $entity = \Cryo\FrameworkUtils::getClass(substr($entity , 1));
+                \Cryo\Boilerplate::autoloadClass($entity[0] == '\\' ? substr($entity , 1) : $entity);
+                $entName = $entity;
+                $entity = \Cryo\FrameworkUtils::getClass($entity[0] == '\\' ? substr($entity , 1) : $entity);
 
                 $fields = [];
 
@@ -115,6 +116,7 @@
                         $fields[] = $property->getAnnotation('@Column')->getCleanValue('name');
                     }
                 }
+                
                 $fieldExists = false;
                 foreach($fields as $field){
                     if ( stristr($method , $field) ) {
@@ -146,9 +148,10 @@
                     
                     foreach($entity->getProperties() as $prop){
                         if ( $prop->hasAnnotation('@Column') ) {
-                            if ( $prop->getAnnotation('@Column')->getCleanValue("name") == $key ) {
-                                $propName = substr($prop->getName() , 1);
-                            }
+                            if ( $prop->getAnnotation('@Column')->getCleanValue("name") == str_replace('"' , '' , $key) ) {
+                                $propName = $propName[0] == '$' ? substr($prop->getName() , 1) : $prop->getName();
+                                
+                            } 
                         }
                     }
                     
