@@ -4,7 +4,7 @@
 
 # CryoCore
 
-An IoC & Low/Minimal Code Framework that brings PHP to life. Create an entire application with very minimal code. Great for startup projects and projects with many microservices. This project is slowly starting to move towards a Configuration as Code Framework, allowing you to create entire applications without a single line of PHP, all this is being designed at the moment so keep checking back to see my progress.
+An IoC & Low/Minimal Code Framework that brings PHP to life. Create an entire application with very minimal code. Great for startup projects and projects with many microservices. This project is slowly starting to move towards a Configuration as Code Framework, although fallback PHP will always be available! Allowing you to create entire applications without a single line of PHP, all this is being designed at the moment so keep checking back to see my progress.
 ## Authors
 
 - [@john-hudson-98](https://www.github.com/john-hudson-98)
