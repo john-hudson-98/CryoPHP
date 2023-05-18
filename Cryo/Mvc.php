@@ -18,7 +18,7 @@
             $response = Mvc\RouterService::route();
 
             if ( is_array($response) ) {
-                header("Location: application/json");
+                header("Content-Type: application/json");
                 die(json_encode($response));
             }
             

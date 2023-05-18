@@ -37,8 +37,12 @@
 
                     file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".php" , $script);
                     file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".meta" , serialize($this->builder->getDefinition()));
-
-                    
+                break;
+                case "Repository":
+                    $this->builder = new YamlClass\Repository($struct);
+                    $script = $this->builder->build();
+                    file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".php" , $script);
+                    file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".meta" , serialize($this->builder->getDefinition()));
                 break;
                 default:
                     die("Unknown class type: " . $struct['type']);

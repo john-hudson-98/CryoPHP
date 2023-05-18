@@ -34,7 +34,10 @@
             $this->name = $newName;
             return $this;
         }
-
+        public function setIsInterface(bool $is) : ScriptClassMethod {
+            $this->isInterface = $is;
+            return $this;
+        }
         /**
          * @param {Annotation} $annotation - the annotation to add.
          * @return {ScriptClassMethod} $self - self reference
@@ -275,7 +278,7 @@
             
             $body = [];
             for($i = $startIndex;$i < $endIndex;$i++){
-                $body[] = $tokens[$i];
+                $body[] = @$tokens[$i];
             }
             return array('body' => $body , 'type' => $returnType);
         }
