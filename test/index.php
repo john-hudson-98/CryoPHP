@@ -1,0 +1,1 @@
+<?php \Cryo\Mvc::TestSuite(); ?>

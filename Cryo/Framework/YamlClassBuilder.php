@@ -17,7 +17,7 @@
             $cacheName = sha1($this->filePath);
 
             $exists = file_exists("var/cache/cryo/yamlclasses/" . $cacheName . ".php");
-            $isLatest = $exists && filemtime($this->filePath) > filemtime("var/cache/cryo/yamlclasses/" . $cacheName . ".php");
+            $isLatest = $exists && filemtime($this->filePath) < filemtime("var/cache/cryo/yamlclasses/" . $cacheName . ".php");
 
             return $isLatest;
         }
