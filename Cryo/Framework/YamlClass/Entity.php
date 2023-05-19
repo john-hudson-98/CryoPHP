@@ -2,6 +2,13 @@
 
     namespace Cryo\Framework\YamlClass;
 
+    /**
+     * This takes an Entity YAML file and converts it to PHP
+     * There is nothing fancy about these classes, except a
+     * series of setters and getters and private properties
+     * that have assigned columns.
+     */
+
     class Entity {
         /**
          * @note - this needs to create a class in a similar

@@ -2,6 +2,13 @@
 
     namespace Cryo\Microservice;
 
+    /**
+     * I've built this rather quick, it has a very principle purpose
+     * to assist load balancing. At some point I want to massively improve this.
+     * Maybe even take in request IDs and store and update them, and delete them after
+     * a timeout. 
+     */
+
     class MysqlPersistedLoadBalancer {
         public function getLeastActiveServer(){
             $db = \Cryo\Connectors\MySQLConnector::Get();

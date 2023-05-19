@@ -2,6 +2,15 @@
 
     namespace Cryo\Framework\YamlClass;
 
+    /**
+     * This class takes YAML controllers, of all subtypes and
+     * basically figures out how to convert it to PHP
+     * This class can definitely be improved but i've built a 
+     * lot of this software with a Prototyping mindset
+     * In release 2 I'll be stripping out unneccesary code
+     * and focusing on improving the core structure of this software
+     */
+
     class Controller {
         private $filePath;
         private $def;

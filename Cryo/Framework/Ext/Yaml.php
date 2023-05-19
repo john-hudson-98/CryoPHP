@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * I've left in the credits to the author of this file
+ * Its the reason this framework has as much YAML functionality
+ * Thanks to Vlad and Chris for this, It actually has been a huge
+ * help in this application. 
+ */
+
+
 /**
    * Spyc -- A Simple PHP YAML Class
    * @version 0.6.2

@@ -2,6 +2,13 @@
 
     namespace Cryo\Microservice;
 
+    /**
+     * This class gets forwards a web request to a 
+     * specified endpoint, used to help connect microservices
+     * and reduce the need for CORS headers being placed 
+     * allover a codebase, drastically reducing its quality
+     */
+
     class ForwardEndpoint
     {
         public function forwardRequest($url , $remove = null , $timeout = 2)

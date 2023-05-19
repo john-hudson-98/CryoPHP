@@ -1,24 +1,35 @@
 <?php
 
     namespace Cryo\Framework\Data;
+
+    /**
+     * @description - the base repository used by the RepositoryBuilder to polyfill functions
+     * This class uses reflection to build up methods to access data within tables,
+     * so far it only has findBy methods, which return a single item. I am going to 
+     * add in pagination methods and the ability to pass parameters to @Query annotations
+     * and similar in YAML by adding an arguments property
+     */
     
     abstract class BaseRepository {
 
         public function __construct(){
             $this->install();
         }
+        // abstract methods
         public abstract function install();
         public abstract function getTableName() : string; //made abstract to make sure interface is autowired only.
+        // end of abstract methods
 
         public function getDatabaseAdapter() : \Cryo\Connectors\IDatabaseConnector {
             //figure out the implementation on this.
             $dot = new \Cryo\Parsers\DotEnv();
 
-            if ( $_SERVER['SERVER_NAME'] == 'localhost' ) {
+            if ( \Cryo\Stage::isDev() ) {
                 $dot->load(".env.local");
             } else {
                 $dot->load(".env.production");
             }
+            // allow the ability to change the repository database option
             $connector = "\Cryo\Connectors\MySQLConnector";
             if ( $dot->get("cryo.repositoryschema") ) {
                 $connector = $dot->get("cryo.repositoryschema");
@@ -27,25 +38,45 @@
             return $connector::Get();
 
         }
+        /**
+         * Allows the saving of entities, the entity must match its annotated type
+         * YAML files will automatically have most of the properties wired,
+         * its recommended to use YAML files for Entities & Repositories as 
+         * its a lot more readable, and more of the heavy lifting is dealt
+         * with by the system
+         */
         public function save($entity){
+
+            //get the class name
             $type = get_class($entity);
 
+            //get the class definition
             $entityDef = \Cryo\FrameworkUtils::getClass($type);
 
+            // make sure the class has the annotation @Entity
             if ( !$entityDef->hasAnnotation('@Entity') ) {
                 throw new \Exception("You cannot save an object that isn't marked with @Entity");
             }
+
+            //since repositories are interfaces, we extend the interface and add \Definition to its 
+            //class name
             $repositoryBase = str_replace('\\Definition' , '' , get_class($this));
 
+            //get the current repositories meta class
             $repository = \Cryo\FrameworkUtils::getClass($repositoryBase);
 
+            //get the current repositories @Repository annotation from its meta class
             $repoAnnotation = $repository->getAnnotation('@Repository');
 
+            //make sure the entity assigned matches the entity passed
             if ( substr($repoAnnotation->getCleanValue('entity'), 1) !== get_class($entity) ) {
                 throw new \Exception("Repository " . $repositoryBase . ' cannot save entity ' . $type . ', the @Repository Annotation is set to ' . $repoAnnotation->getCleanValue('entity'));
             }
             //can now save.
-
+            /**
+             * Below is some heavy reflection, utilising the meta class functionality I've added
+             * it checks for private/protected properties and uses Reflection to retrieve its value
+             */
             $fields = [];
             $idColumn = null;
             $reflectionObj = new \ReflectionObject($entity);
@@ -71,7 +102,12 @@
             }
             $tableName = $repoAnnotation->getCleanValue('table');
 
-            $query = "INSERT INTO {$tableName} ( ";
+            /**
+             * Builds the insert query, save automatically updates 
+             * if the record exists, using on duplicate key
+            */
+
+             $query = "INSERT INTO {$tableName} ( ";
 
             $i = 0;
             foreach($fields as $field => $value) {

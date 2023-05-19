@@ -4,10 +4,21 @@
 
     require_once(__DIR__ . '/../Framework/Ext/Yaml.php');
 
+    /**
+     * @description:
+     * This is the primary database connector for the system, I will be adding the option
+     * in the near future to allow other database engines such as Postgres or Dynamo
+     * This class when connected, will create any tables defined in YAML files
+     */
+    /**
+     * @singleton
+     */
     class MySQLConnector implements IDatabaseConnector {
 
+        /** @param MysqlDatabase */
         private $resource;
 
+        /** @param {Singleton:self} */
         private static $self = null;
 
         private function __construct(){
@@ -16,9 +27,15 @@
         public static function Get(){
             return self::$self ? self::$self : new MySQLConnector();
         }
+        /**
+         * @description - shorthand for real_escape_string
+         */
         public function escape($escape){
             return $this->resource->real_escape_string($escape);
         }
+        /**
+         * @implements IDatabaseConnector::query
+         */
         public function query(string $query , array $binds = []) : array{
             foreach($binds as $key => $val){
                 if ( is_null($val) ) {
@@ -47,12 +64,13 @@
             if ( $resp === true ) {
                 return [];
             }
+            //convert from object to associative array.
             return json_decode(json_encode($resp) , true);
         }
         public function connect(){
             $dot = new \Cryo\Parsers\DotEnv();
 
-            if ( $_SERVER['SERVER_NAME'] == 'localhost' ) {
+            if ( \Cryo\Stage::isDev() ) {
                 $dot->load(".env.local");
             } else {
                 $dot->load(".env.production");
@@ -77,6 +95,11 @@
         public function disconnect(){
             $this->resource->disconnect();
         }
+        /**
+         * Gets a collection of YAML installation files
+         * and iterates them, parsing them and passing them
+         * as arrays to the install function
+         */
         public function checkInstallation(){
             @mkdir("var/cache/cryo/install" , 0755 , true);
 
@@ -87,6 +110,12 @@
                 $this->install(\spyc_load($doc) , sha1($doc) , sha1($installation));
             }
         }
+        /**
+         * This will install the YAML files, then cache a marker file against them
+         * When changes are made, the system will rerun the installers
+         * This doesn't wipe existing tables, but can be used to add new tables
+         * I'll be working on table update functionality to auto-add columns 
+         */
         private function install($install , $sha1 , $cacheName){
 
             foreach($install['schema'] as $label => $table){
@@ -122,6 +151,10 @@
             
             file_put_contents('var/cache/cryo/install/' . $cacheName , $sha1);
         }
+        /**
+         * Just iterates the src directory getting a list of YAML files
+         * where the Type == Install and Adapter is equal to this classes name
+         */
         private static function getYamlInstalls(string $dir) : array{
             $out = [];
             foreach(glob($dir . "/*") as $entry){

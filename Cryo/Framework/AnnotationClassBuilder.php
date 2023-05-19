@@ -2,6 +2,12 @@
 
     namespace Cryo\Framework;
 
+    /**
+     * Another feature developed early in the system, 
+     * this takes the Annotations interface and extends it 
+     * based on values passed.
+     */
+
     class AnnotationClassBuilder {
         public static function fromInterface(string $className , Annotation $annot){
             $php = '<?php ' . PHP_EOL . PHP_EOL;

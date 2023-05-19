@@ -2,6 +2,10 @@
 
     namespace Cryo\Framework;
 
+    /**
+     * This holds meta information about an argument for a class method
+     */
+
     class ScriptClassMethodArgument {
 
         /** @param {String} $argumentName - the name of the argument */

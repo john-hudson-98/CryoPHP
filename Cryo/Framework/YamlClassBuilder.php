@@ -4,6 +4,10 @@
 
     require_once('Cryo/Framework/Ext/Yaml.php');
 
+    /**
+     * This class builds all entities that have YAML defining support
+     */
+
     class YamlClassBuilder {
 
         private $filePath;

@@ -2,6 +2,13 @@
 
     namespace Cryo\Framework\Formatting;
 
+    /**
+     * Developed very early in the system, I built this to fix small annoyances
+     * with the code, but realised its actually pretty much useless, however
+     * do not delete this as I haven't had chance to refactor this out
+     * and it will certainly break things. 
+     */
+
     class PHPrettify {
 
         public function prettify(string $source) : string{

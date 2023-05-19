@@ -2,6 +2,9 @@
 
     namespace Cryo\Framework\YamlClass;
 
+    /**
+     * Creates a class in a similar way to entity, except for repositories
+     */
     class Repository {
         /**
          * @note - this needs to create a class in a similar

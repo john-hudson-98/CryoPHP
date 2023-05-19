@@ -2,6 +2,11 @@
 
     namespace Cryo\Framework;
 
+    /**
+     * This class is for functions of a class, it holds all the meta data about
+     * a method, as well as any annotations.
+     */
+
     class ScriptClassMethod {
         /** @param {String} $visibility - [public|protected|private] */
         private $visibility = 'public';

@@ -2,6 +2,13 @@
 
     namespace Cryo\Framework;
 
+    /**
+     * This is what breaks the CryoPHP code down into tokens 
+     * This class could definitely do with some improvement
+     * but it works so I'm not going to attempt to improve it
+     * yet.
+     */
+
     class Tokenizer {
         private $input;
         private $position;

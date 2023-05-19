@@ -2,6 +2,12 @@
 
     namespace Cryo\Framework;
 
+    /**
+     * Annotations are a great way to add descriptions to code, they are also referred to as decorators
+     * In PHP natively these aren't available. However I've added functionality to allow you to read the
+     * annotations values, you can access these by getting the current property, method or class.
+     */
+
     class Annotation {
         private $name = '';
         private $attributes = [];
@@ -44,6 +50,12 @@
         public function toCommentSpec(){
             return "/** {$this->name}(" . str_replace('*/' , '*\/' , implode(" , " , $this->attributes)) . ") **/";
         }
+        /**
+         * This applies an annotation to a variable
+         * Some annotations are purely lexical and provide instructions
+         * to the interpreter, others have actual functionality and provide real purpose 
+         * to your code. 
+         */
         public static function apply($annotationName , $attributes , $initialValue , $type = ''){
             if ( @self::$Modifiers[$annotationName] ) {
                 $initialValue = self::$Modifiers[$annotationName]($initialValue , json_decode($attributes , true) , $type);

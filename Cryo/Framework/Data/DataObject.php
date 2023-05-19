@@ -2,6 +2,11 @@
 
     namespace Cryo\Framework\Data;
 
+    /**
+     * This is a primitive object, its used in a couple of places, mainly in Block & Layout
+     * It simply stores,retrieves and checks for existence of properties. 
+    */
+
     class DataObject {
         
         private $_data = [];

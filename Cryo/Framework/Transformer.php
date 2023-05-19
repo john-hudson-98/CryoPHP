@@ -6,7 +6,8 @@
         
         /**
          * @description - this class takes the array of tokens from the tokenizer 
-         *              - and builds up a decision tree
+         *              - and builds up a decision tree, ready to be transpiled back
+         *              - down to valid PHP
          */
         
         private $tokens = [];
