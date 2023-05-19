@@ -2,6 +2,8 @@
 
     namespace Cryo\Connectors;
 
+    require_once(__DIR__ . '/../Framework/Ext/Yaml.php');
+
     class MySQLConnector implements IDatabaseConnector {
 
         private $resource;
@@ -70,10 +72,95 @@
             $this->resource->query("CREATE DATABASE IF NOT EXISTS `{$dot->get("mysql.schema")}`");
             $this->resource->select_db($dot->get("mysql.schema"));
 
-            
+            $this->checkInstallation();
         }
         public function disconnect(){
             $this->resource->disconnect();
+        }
+        public function checkInstallation(){
+            @mkdir("var/cache/cryo/install" , 0755 , true);
+
+            $toInstall = self::getYamlInstalls("src");
+
+            foreach($toInstall as $installation){
+                $doc = file_get_contents($installation);
+                $this->install(\spyc_load($doc) , sha1($doc) , sha1($installation));
+            }
+        }
+        private function install($install , $sha1 , $cacheName){
+
+            foreach($install['schema'] as $label => $table){
+                $query = "CREATE TABLE IF NOT EXISTS {$table['table']} (\n";
+
+                $i = 0;
+                $primaryKey = null;
+                foreach($table['fields'] as $field => $struct){
+                    $query .= ($i > 0 ? ',' . PHP_EOL : '') . "\t" . $field . " {$struct['type']} " . (@$struct['null'] ? ' NULL ' : ' NOT NULL ') . (@$struct['default'] ? ' DEFAULT \'' . str_replace(['"' , "'"] , '' , $struct['default']) . '\' ' : '') . (@$struct['unique'] ? "UNIQUE " : '') . (@$struct['auto_increment'] ? 'AUTO_INCREMENT' : '');
+                    if ( @$struct['primary'] ) {
+                        $primaryKey = $field;
+                    }
+                    $i++;
+                }
+                if ( $primaryKey ) {
+                    $query .= " , \n\tPRIMARY KEY(`{$primaryKey}`)";
+                }
+                if ( isset($table['foreign-keys']) ) {
+                    foreach($table['foreign-keys'] as $fkName => $fk){
+                        $query .= " ,\n\tFOREIGN KEY `fk_{$table['table']}_{$fkName}` (`{$fkName}`) REFERENCES {$fk['references']}";
+
+                        if ( @$fk['delete'] ) {
+                            $query .= " ON DELETE " . strtoupper($fk['delete']);
+                        }
+                        if ( @$fk['update'] ) {
+                            $query .= " ON UPDATE " . strtoupper($fk['update']);
+                        }
+                    }
+                }
+                $query .= "\n)";
+                $this->query($query);
+            }
+            
+            file_put_contents('var/cache/cryo/install/' . $cacheName , $sha1);
+        }
+        private static function getYamlInstalls(string $dir) : array{
+            $out = [];
+            foreach(glob($dir . "/*") as $entry){
+
+                if ( is_dir($entry) ) {
+                    $a = self::getYamlInstalls($entry);
+
+                    $out = array_merge($out , $a);
+                } else {
+                    if ( stristr($entry , '.yaml') ) {
+                        $file = file_get_contents($entry);
+                        $type = explode("\n" , $file)[0];
+
+                        if ( !stristr($type , 'type:') ) {
+                            continue;
+                        }
+
+                        if ( !stristr($type , 'Install') ) {
+                            continue;
+                        }
+                        if ( !stristr($file , '\Cryo\Connectors\MySQLConnector') ) {
+                            continue;
+                        }
+
+                        $cacheName = sha1($entry);
+
+                        if ( file_exists("var/cache/cryo/install/{$cacheName}") ) {
+                            if ( file_get_contents("var/cache/cryo/install/{$cacheName}") == sha1($file) ) {
+                                //no changes to make
+                            } else {
+                                $out[] = $entry;
+                            }
+                        } else {
+                            $out[] = $entry;
+                        }
+                    }
+                }
+            }
+            return $out;
         }
     }
 
