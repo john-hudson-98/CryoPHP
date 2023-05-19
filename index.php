@@ -3,12 +3,6 @@
     ini_set("display_errors" , 1);
     error_reporting(E_ALL);
 
-    if ( stristr($_SERVER['REQUEST_URI'] , '/showUri') ) {
-        echo '<pre>';
-        var_dump($_SERVER['REQUEST_URI']);
-        die();
-    }
-
     session_start();
 
     @mkdir("src");
