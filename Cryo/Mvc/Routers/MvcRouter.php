@@ -160,15 +160,13 @@
                 'match' => false , 
                 'variables' => []
             );
-
             if ( count($pathItems) !== count($urlItems) ) {
                 return $resp;
             }
             for($i = 0;$i < count($pathItems);$i++){
                 $path = $pathItems[$i];
                 $url = $urlItems[$i];
-
-                if ( $path == '*' ) {
+                if ( $path == '*' || @$path[0] == '*' ) {
                     // allows wildcarding
                     continue;
                 }

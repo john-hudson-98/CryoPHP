@@ -14,6 +14,9 @@
         public static function Get(){
             return self::$self ? self::$self : new MySQLConnector();
         }
+        public function escape($escape){
+            return $this->resource->real_escape_string($escape);
+        }
         public function query(string $query , array $binds = []) : array{
             foreach($binds as $key => $val){
                 if ( is_null($val) ) {

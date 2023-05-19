@@ -4,7 +4,7 @@
 
     class ForwardEndpoint
     {
-        public function forwardRequest($url , $remove)
+        public function forwardRequest($url , $remove = null)
         {
             // Get the current request headers
             $headers = getallheaders();
@@ -12,7 +12,9 @@
             // Get the request method
             $method = $_SERVER['REQUEST_METHOD'];
 
-            $url .= '/' . str_replace($remove , '' , $_SERVER['REQUEST_URI']);
+            if ( $remove ) {
+                $url .= '/' . str_replace($remove , '' , $_SERVER['REQUEST_URI']);
+            }
 
             $url = str_replace('//' , '/' , $url);
             $url = str_replace(':/' , '://' , $url);
@@ -24,6 +26,7 @@
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 2 , 
                 CURLOPT_CUSTOMREQUEST => $method,
                 CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'] , 
                 CURLOPT_HTTPHEADER => $this->prepareHeaders($headers),
