@@ -38,6 +38,18 @@
             $this->isInterface = $is;
             return $this;
         }
+        public function setVisibility(string $visibility) : ScriptClassMethod {
+            $this->visibility = $visibility;
+            return $this;
+        }
+        public function setBody(string $body) : ScriptClassMethod {
+            $this->body = $body;
+            return $this;
+        }
+        public function setReturnType($type) : ScriptClassMethod {
+            $this->returnType = $type;
+            return $this;
+        }
         /**
          * @param {Annotation} $annotation - the annotation to add.
          * @return {ScriptClassMethod} $self - self reference

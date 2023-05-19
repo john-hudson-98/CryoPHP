@@ -44,6 +44,10 @@
                     file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".php" , $script);
                     file_put_contents("var/cache/cryo/yamlclasses/" . $cacheName . ".meta" , serialize($this->builder->getDefinition()));
                 break;
+                case "Controller":
+                    $this->builder = new YamlClass\Controller($struct , $this->filePath);
+                    $this->builder->build();
+                break;
                 default:
                     die("Unknown class type: " . $struct['type']);
             }

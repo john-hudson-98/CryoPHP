@@ -52,6 +52,40 @@
 
                 \Cryo\Boilerplate::autoloadClass($cname);
             }
+            $yaml = self::getYamlControllers('src');
+
+            foreach($yaml as $yamlController) {
+                $cname = str_replace('/' , '\\' , str_replace('.yaml' , '' , str_replace('src/' , 'App/' , $yamlController)));
+
+                \Cryo\Boilerplate::autoloadClass($cname);
+            }
+        }
+        private static function getYamlControllers(string $dir) : array{
+            $out = [];
+            foreach(glob($dir . "/*") as $entry){
+
+                if ( is_dir($entry) ) {
+                    $a = self::getYamlControllers($entry);
+
+                    $out = array_merge($out , $a);
+                } else {
+                    if ( stristr($entry , '.yaml') ) {
+
+                        $type = explode("\n" , file_get_contents($entry))[0];
+
+                        if ( !stristr($type , 'type:') ) {
+                            continue;
+                        }
+
+                        if ( !stristr($type , 'Controller') ) {
+                            continue;
+                        }
+                        
+                        $out[] = $entry;
+                    }
+                }
+            }
+            return $out;
         }
         /**
          * @description - All Routers are SINGLETONS. They must have a static method called Get()

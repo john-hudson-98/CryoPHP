@@ -13,7 +13,14 @@
             $this->setTemplate('page/' . $structure . '.phtml');
             return $this;
         }
+        public function setTheme($theme) : Layout{
+            self::$theme = $theme;
+            return $this;
+        }
         public function loadLayout(){
+            if ( !file_exists("src/theme/" . self::$theme . "/layout/" . self::$structure . ".json") ) {
+                throw new \Exception("Layout file: " . "src/theme/" . self::$theme . "/layout/" . self::$structure . ".json" . " does not exist");
+            }
             $list = json_decode(file_get_contents("src/theme/" . self::$theme . "/layout/" . self::$structure . ".json") , true);
 
             $this->buildTree($list , $this);
