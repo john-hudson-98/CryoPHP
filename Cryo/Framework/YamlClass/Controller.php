@@ -65,6 +65,22 @@
                     $classDefinition->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@ReactRoute' , '(' , 'match_type' , '=' , '"' . $definition['route']['match_type'] . '"' , ',' , 'value' , '=' , '"' . $definition['route']['path'] . '"' , ',' , 'mapsTo' , '=' , '"' . $definition['route']['mapsTo'] . '"' , ')']));
                    
                 break;
+                case "EndpointForward":
+                    
+                    if ( !$definition['endpoints'] ) {
+                        throw new \Exception("No Endpoints Specified");
+                    }
+
+                    foreach($definition['endpoints'] as $methodName => $endpoint) {
+                        $method = new \Cryo\Framework\ScriptClassMethod($methodName);
+                        $method->rename($methodName);
+
+                        $method->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@Route' , '(' , 'path' , '=' , '"' . $endpoint['route']['path'] . '"' , ',' , 'allow' , '=' , '"' . implode("," , $endpoint['route']['methods']) . '"' , ')']));
+                        $method->setBody("\t\t\t\t\t\$req = new \Cryo\Microservice\ForwardEndpoint();\n\techo \$req->forwardRequest('{$endpoint['endpoint']['url']}' , '{$endpoint['endpoint']['remove']}');\n");
+                        $classDefinition->addMethod($method);
+                    }
+
+                break;
             }
 
             
