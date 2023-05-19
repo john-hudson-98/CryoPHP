@@ -35,9 +35,9 @@
             
             if ( $iface->getAnnotation('@Repository')->hasValue('install') ) {
                 $php .= "\t\t\$this->getDatabaseAdapter()->query(file_get_contents('src/" . $iface->getAnnotation('@Repository')->getCleanValue("install") . "'));\n";
-            } else {
-                throw new \Exception("RepositoryException - @Repository annotation missing install attribute");
             }
+            //exception made redundant as YAML install files became available. This will just resort
+            //to throwing a query exception.
 
             $php .= "\t}\n";
             
