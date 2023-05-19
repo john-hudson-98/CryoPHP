@@ -23,6 +23,15 @@
             $classDefinition->setNamespace($namespace);
             $classDefinition->setClassName($className);
 
+            if ( @$definition['autowire'] ) {
+                foreach($definition['autowire'] as $varName => $className){
+                    $property = new \Cryo\Framework\ScriptClassProperty('$' . $varName);
+                    $property->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@Autowired']));
+                    $property->setType($className);
+                    $classDefinition->addProperty($property);
+                }
+            }
+
             switch($definition['subType']) {
                 case "MVCController":
                     $classDefinition->setExtends('\Cryo\Framework\YamlClass\Controller\AbstractYamlMvcController');
@@ -42,16 +51,23 @@
                             $method->setBody($body);
                         }
                         $classDefinition->addMethod($method);
+                        $theme = new \Cryo\Framework\ScriptClassMethod();
+                        $theme->setVisibility('public');
+                        $theme->rename('getTheme');
+                        $theme->setReturnType('string');
+                        $theme->setBody("\t\treturn '" . $definition['meta']['theme'] . "';\n");
+                        $classDefinition->addMethod($theme);
                     }
+                break;
+                case "ReactApp":
+
+                    $classDefinition->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@ReactApp' , '(' , 'app_name' , '=' , '"' . $definition['app']['name'] . '"' , ',' , 'local_url' , '=' , '"' . $definition['app']['local_url'] . '"' , ')']));
+                    $classDefinition->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@ReactRoute' , '(' , 'match_type' , '=' , '"' . $definition['route']['match_type'] . '"' , ',' , 'value' , '=' , '"' . $definition['route']['path'] . '"' , ',' , 'mapsTo' , '=' , '"' . $definition['route']['mapsTo'] . '"' , ')']));
+                   
                 break;
             }
 
-            $theme = new \Cryo\Framework\ScriptClassMethod();
-            $theme->setVisibility('public');
-            $theme->rename('getTheme');
-            $theme->setReturnType('string');
-            $theme->setBody("\t\treturn '" . $definition['meta']['theme'] . "';\n");
-            $classDefinition->addMethod($theme);
+            
 
 
             $classDefinition->addAnnotation(\Cryo\Framework\Annotation::fromTokens(['@Controller']));

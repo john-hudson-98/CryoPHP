@@ -30,6 +30,10 @@
             $this->type = $type;
             $this->isStatic = $static;
         }
+        public function setType(string $type) : ScriptClassProperty {
+            $this->type = $type;
+            return $this;
+        }
         public function getName(){
             return $this->name;
         }
