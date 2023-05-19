@@ -151,7 +151,7 @@
                             \$server = \$this->getLeastActiveServer();
                             \$this->addRequest(\$server);
                             \$req = new \Cryo\Microservice\ForwardEndpoint();
-                            \$resp = \$req->forwardRequest(\$server['server_ip'] . \$_SERVER['REQUEST_URI']);
+                            \$resp = \$req->forwardRequest(\$server['server_ip'] . \$_SERVER['REQUEST_URI'] , '{$definition['timeout']}');
                             \$this->finishRequest(\$server);
                             return \$resp;
                         ");

@@ -4,7 +4,7 @@
 
     class ForwardEndpoint
     {
-        public function forwardRequest($url , $remove = null)
+        public function forwardRequest($url , $remove = null , $timeout = 2)
         {
             // Get the current request headers
             $headers = getallheaders();
@@ -26,7 +26,7 @@
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 2 , 
+                CURLOPT_TIMEOUT => $timeout , 
                 CURLOPT_CUSTOMREQUEST => $method,
                 CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'] , 
                 CURLOPT_HTTPHEADER => $this->prepareHeaders($headers),
