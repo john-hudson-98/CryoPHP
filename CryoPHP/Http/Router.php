@@ -17,6 +17,7 @@
                     $cache->load($definition);   
                 } else {
                     $loader->load($definition);
+                    $cache->load($definition);   
                 }
             }
             $controllers = [];
@@ -64,14 +65,21 @@
         private function dispatch($path , $possibleRoutes , $controller) {
             $handled = false;
             foreach($possibleRoutes as $route){
-                if ( in_array($_SERVER['REQUEST_METHOD'] , $route['methods']) ) {
-                    $handled = true;
-
-                    $methodOnClass = $route['call'];
-
+                
+                if ( method_exists($controller , 'flagReactApp') ) {
+                    // is a react app?
                     $inst = new $controller();
-                    $inst->{$methodOnClass}();
-                    exit();
+                    $inst->index();
+                } else {
+                    if ( in_array($_SERVER['REQUEST_METHOD'] , $route['methods']) ) {
+                        $handled = true;
+
+                        $methodOnClass = $route['call'];
+
+                        $inst = new $controller();
+                        $inst->{$methodOnClass}();
+                        exit();
+                    }
                 }
             }
             

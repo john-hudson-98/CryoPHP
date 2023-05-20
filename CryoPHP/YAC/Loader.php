@@ -22,8 +22,6 @@
             $cache = new \Cryo\Core\CacheManager();
 
             $cache->saveCache($yamlFile , $builder->toSource() , 'Controller');
-
-            die();
         }
 
     }
