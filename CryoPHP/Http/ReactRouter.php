@@ -17,6 +17,10 @@
          * @param {String} $url - the URL that is sent to the controller.
          */
         public static function serveApp($localUrl ,  $appName , $url = "") : void {
+
+            $url = str_replace('//' , '/' , $url);
+
+            // die($url);
             
             $pageName = ucfirst($appName); // this can be overwritten by the react app.
             

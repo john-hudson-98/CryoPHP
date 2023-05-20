@@ -28,11 +28,20 @@
             }
 
             foreach($controllers as $controller){
-                $routes = $controller::GetRoutes();
-                foreach($routes as $path => $possibleRoutes) {
-                    if ( $this->urlMatches($path , $url) ) {
-                        $this->dispatch($path , $possibleRoutes , $controller);
-                        die();
+                if ( method_exists($controller , 'flagReactApp' )) {
+                    // check whether a URL starts with 
+                    $_url = array_keys($controller::GetRoutes())[0];
+                    
+                    if ( substr($url , 0 , strlen($_url)) == $_url ) {
+                        $this->dispatch($url , ['call' => 'index' , 'methods' => 'GET,OPTIONS'] , $controller);
+                    }
+                } else {
+                    $routes = $controller::GetRoutes();
+                    foreach($routes as $path => $possibleRoutes) {
+                        if ( $this->urlMatches($path , $url) ) {
+                            $this->dispatch($path , $possibleRoutes , $controller);
+                            die();
+                        }
                     }
                 }
             }
