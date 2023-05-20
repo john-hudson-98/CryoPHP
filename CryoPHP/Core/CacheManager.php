@@ -11,7 +11,7 @@
         public function cacheExistsNoType($filename){
             $cacheName = sha1($filename) . ".php";
             $cacheMatch = glob("var/cache/cryo/*/{$cacheName}");
-            return count($cacheMatch) > 0 && (filemtime($filename) > filemtime($cacheMatch[0]));
+            return count($cacheMatch) > 0 && (filemtime($filename) < filemtime($cacheMatch[0]));
         }
         public function load($filename){
             $cacheName = sha1($filename) . ".php";

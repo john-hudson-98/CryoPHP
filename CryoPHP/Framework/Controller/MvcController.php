@@ -3,7 +3,14 @@
     namespace Cryo\Framework\Controller;
 
     class MvcController {
-        
+        private $layout;
+
+        public function __construct(){
+            $this->layout = new \Cryo\Framework\Layout();
+        }
+        public function getLayout() : ?\Cryo\Framework\Layout {
+            return $this->layout;
+        }
     }
 
 ?>

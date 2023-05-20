@@ -41,7 +41,7 @@
             return $this->implements;
         }
 
-        public function addMethod($methodName , $arguments = [] , $body , $returnType = null , $isStatic = false) {
+        public function addMethod($methodName , $arguments = [] , $body = '' , $returnType = null , $isStatic = false) {
             $this->methods[$methodName] = array(
                 'body' => $body , 
                 'type' => $returnType , 

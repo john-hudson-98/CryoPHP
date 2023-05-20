@@ -28,7 +28,6 @@
 
             foreach($controllers as $controller){
                 $routes = $controller::GetRoutes();
-
                 foreach($routes as $path => $possibleRoutes) {
                     if ( $this->urlMatches($path , $url) ) {
                         $this->dispatch($path , $possibleRoutes , $controller);

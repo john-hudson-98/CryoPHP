@@ -20,7 +20,14 @@
                     'call' => $methodName
                 );
 
-                $classBuilder->addMethod($methodName , [] , "\t\tinclude('{$config['handle']}');\n");
+                $classBuilder->addMethod($methodName , [] , "
+                    
+                    if ( \$this->getLayout() ) {
+                        \$this->getLayout()->setTheme('{$definition['meta']['theme']}');
+                        \$this->getLayout()->setStructure('{$config['structure']}');    
+                    }
+
+                    include('{$config['handle']}');\n");
             }
             $classBuilder->addMethod("flagController" , [] , "\t\treturn true;\n" , 'bool' , true);
             $classBuilder->addMethod("GetRoutes" , [] ,  "\t\treturn json_decode('" . json_encode($routes) . "' , true);\n" , 'array' , true);
