@@ -31,7 +31,7 @@
                 if ( method_exists($controller , 'flagReactApp' )) {
                     // check whether a URL starts with 
                     $_url = array_keys($controller::GetRoutes())[0];
-                    
+
                     if ( substr($url , 0 , strlen($_url)) == $_url ) {
                         $this->dispatch($url , ['call' => 'index' , 'methods' => 'GET,OPTIONS'] , $controller);
                     }
@@ -59,12 +59,13 @@
             if ( $url == $route ) {
                 return true; //exact route
             }
-            if ( @preg_match($route , $url) ) {
-                return true; //allow regular expression matching
-            }
+            
             $path = explode("/" , $url);
             $routeItems = explode("/" , $route);
-
+            $invalid = false;
+            if ( count($path) !== count($routeItems) ) {
+                return false;
+            }
             for($i = 0;$i < count($path);$i++){
                 if ( isset($routeItems[$i]) ) {
                     if ( $routeItems[$i] == '*' ) {
@@ -73,10 +74,14 @@
                     if ( $routeItems[$i] == $path[$i] ) {
                         continue;
                     }
+                    if ( $path[$i] !== $routeItems[$i] ) {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
             }
+            
             return true;
         }
         private function dispatch($path , $possibleRoutes , $controller) {

@@ -16,6 +16,10 @@
                     self::loadCryoClass($className);
                     return;
                 }
+                if ( substr($className , 0 , 4) == 'App\\' ) {
+                    self::loadAppClass($className);
+                    return;
+                }
                 $imported = false;
                 foreach(self::$customAutoloaders as $loader) {
                     if ( $loader->canAutoload($className) ) {
@@ -35,7 +39,15 @@
         public static function addCustomAutoLoader(\Cryo\Core\AutoloaderInterface $autoloader) {
             self::$customAutoloaders[] = $autoloader;
         }
-
+        private static function loadAppClass($className) {
+            $path = 'src/' . substr($className , 4) . '.*';
+            $file = glob($path);
+            if ( stristr($className , '.yaml') || stristr($className , '.yml') ) {
+                //need to implement this
+            } else {
+                require_once($file[0]);
+            }
+        }
         private static function loadCryoClass($className){
             $path = 'CryoPHP/' . str_replace('\\' , '/' , substr($className , 5)) . '.php';
 

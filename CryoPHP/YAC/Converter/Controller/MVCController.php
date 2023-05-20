@@ -19,9 +19,17 @@
                     'methods' => isset($config['match']['methods']) ? $config['match']['methods'] : '*' , 
                     'call' => $methodName
                 );
+                $authorizer = "";
+
+                if ( isset($config['authorizer']) ) {
+                    $class = $config['authorizer']['class'];
+                    $authUrl = $config['authorizer']['authRedirect'];
+
+                    $authorizer = "\t\t\t\$auth = new \\{$class}();\n\t\t\tif(!\$auth->isAuthorized()){ \n\t\t\t\tif ( !stristr(\$_SERVER['REQUEST_URI'] , '{$authUrl}')){ header('Location: {$authUrl}'); } }";
+                }
 
                 $classBuilder->addMethod($methodName , [] , "
-                    
+                    {$authorizer}
                     if ( \$this->getLayout() ) {
                         \$this->getLayout()->setTheme('{$definition['meta']['theme']}');
                         \$this->getLayout()->setStructure('{$config['structure']}');    
