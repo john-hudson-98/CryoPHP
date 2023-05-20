@@ -1,6 +1,6 @@
 <?php
 
-    namespace Cryo\Mvc;
+    namespace Cryo\Framework;
 
     class Block extends \Cryo\Framework\Data\DataObject {
         
