@@ -30,7 +30,7 @@
             });
 
             $router = new \Cryo\Http\Router();
-            $router->route(explode("?" , $_SERVER['REQUEST_URI'])[0]);
+            $router->route(explode("?" , $_SERVER['REQUEST_URI'])[0] , $appConfig);
         }
         public static function addCustomAutoLoader(\Cryo\Core\AutoloaderInterface $autoloader) {
             self::$customAutoloaders[] = $autoloader;

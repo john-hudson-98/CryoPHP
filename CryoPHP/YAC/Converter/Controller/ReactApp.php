@@ -15,7 +15,7 @@
             );
 
             $classBuilder->addMethod('index' , [] , "
-                \Cryo\Http\ReactRouter::serveApp('{$definition['app']['local_url']}' , '{$definition['app']['name']}' , '{$_SERVER['REQUEST_URI']}');
+                \Cryo\Http\ReactRouter::serveApp('{$definition['app']['local_url']}' , '{$definition['app']['name']}' , \$_SERVER['REQUEST_URI']);
             \n");
 
             $classBuilder->addMethod("flagController" , [] , "\t\treturn true;\n" , 'bool' , true);

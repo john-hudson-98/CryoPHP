@@ -85,6 +85,7 @@
                 CURLOPT_URL => $localUrl . $url , 
                 CURLOPT_HEADER => 1
             ));
+            // die($localUrl . $url);
             // echo $localUrl . $_SERVER['REQUEST_URI'];
             $response = curl_exec($ch);
 

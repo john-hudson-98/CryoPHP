@@ -4,7 +4,7 @@
 
     class Router {
 
-        public function route($url){
+        public function route($url , $config = null){
             $all = $this->getYamlFiles('src');
             
             $cache = new \Cryo\Core\CacheManager();
@@ -36,13 +36,21 @@
                     }
                 }
             }
+
+            if ( $config ) {
+                if ( isset($config['fallbackController']) ) {
+                    $inst = new $config['fallbackController']();
+
+                    $inst->{$config['fallbackMethod'] ?? "index"}();
+                }
+            }
             
         }
         private function urlMatches($route , $url){
             if ( $url == $route ) {
                 return true; //exact route
             }
-            if ( preg_match($route , $url) ) {
+            if ( @preg_match($route , $url) ) {
                 return true; //allow regular expression matching
             }
             $path = explode("/" , $url);
