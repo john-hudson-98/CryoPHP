@@ -28,7 +28,10 @@
             }
 
             foreach($controllers as $controller){
-                if ( method_exists($controller , 'flagReactApp' )) {
+                if ( method_exists($controller , 'flagLoadBalancer') ) {
+                    $inst = new $controller();
+                    $inst->index();
+                } else if ( method_exists($controller , 'flagReactApp' )) {
                     // check whether a URL starts with 
                     $_url = array_keys($controller::GetRoutes())[0];
 
