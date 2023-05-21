@@ -7,7 +7,7 @@
             
             $classBuilder = new \Cryo\Core\Transform\ClassBuilder();
 
-            $classBuilder->addMethod('getPrimaryKey' , [] , "\t\treturn '{$definition['meta']['primaryKey']}';\n" , 'string' , false);
+            $classBuilder->addMethod('getPrimaryKey' , [] , "\t\treturn '{$definition['meta']['primaryKey']}';\n" , 'string' , true);
 
             foreach($definition['properties'] as $name => $conf){
                 $classBuilder->addProperty($name , $conf['type']);
