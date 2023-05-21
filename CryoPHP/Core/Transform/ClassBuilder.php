@@ -8,6 +8,7 @@
         private $extends = null;
         private $implements = null;
         private $methods = [];
+        private $properties = [];
 
         public function setNamespace(string $namespace) : ClassBuilder {
             $this->namespace = $namespace;
@@ -50,12 +51,24 @@
             );
             return $this;
         }
+        public function addProperty($name , $type , $visibility = 'private') {
+            $this->properties[$name] = array(
+                'type' => $type , 
+                'visibility' => $visibility
+            );
+            return $this;
+        }
         
         public function toSource(){
             $out = '<?php' . PHP_EOL . PHP_EOL;
 
             $out .= "\tnamespace {$this->namespace};\n\n";
             $out .= "\tclass {$this->className} " . ($this->extends ? "extends {$this->extends} " : "") . ($this->implements ? "implements {$this->implements} " : "") . "{\n\n";
+            
+            foreach($this->properties as $name => $meta) {
+                $out .= "\t\t{$meta['visibility']} \${$name};\n";
+            }
+
             foreach($this->methods as $name => $body) {
                 $out .= "\t\tpublic " . ($body['static'] ? 'static ' : '') . "function {$name}(";
 

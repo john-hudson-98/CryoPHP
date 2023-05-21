@@ -9,7 +9,13 @@
             $validator->validate(file_get_contents($yamlFile));
             $definition = $validator->getDefinition();
             //an exception would be thrown if YAML is not valid YAC
-            $converterClass = '\\Cryo\\YAC\\Converter\\Controller\\' . $definition['subType'];
+            $converterClass = '';
+
+            if ( @$definition['subType'] ) {
+                $converterClass = '\\Cryo\\YAC\\Converter\\' . $definition['type'] . '\\' . $definition['subType'];
+            } else {
+                $converterClass = '\\Cryo\\YAC\\Converter\\' . $definition['type'];
+            }
             $fullClassName = str_replace('/' , '\\' , str_replace('src/' , 'App\\' , str_replace(['.yaml' , '.yml'] , '' , $yamlFile)));
             $className = basename($fullClassName);
             $namespace = str_replace('\\' . $className , '' , $fullClassName);
@@ -21,7 +27,7 @@
             
             $cache = new \Cryo\Core\CacheManager();
 
-            $cache->saveCache($yamlFile , $builder->toSource() , 'Controller');
+            $cache->saveCache($yamlFile , $builder->toSource() , $definition['type']);
         }
 
     }
