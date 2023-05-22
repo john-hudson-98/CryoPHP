@@ -7,7 +7,7 @@
         private $definition;
 
         public function validate(array $definition) : bool {
-            $allowedSubTypes = ["MVCController" , "ReactApp" , "EndpointForward" , "LoadBalancer" , "QueryAPIController"];
+            $allowedSubTypes = ["MVCController" , "ReactApp" , "EndpointForward" , "LoadBalancer" , "ApiController"];
 
             if ( !in_array($definition['subType'] , $allowedSubTypes) ) {
                 throw new \Exception("Unknown Sub Controller Type: {$definition['subType']}");

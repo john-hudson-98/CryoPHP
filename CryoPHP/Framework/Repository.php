@@ -4,7 +4,9 @@
 
     class Repository {
         
-
+        public function findAll($start = 0 , $limit = 20){
+            return $this->getDbAdapter()->query("SELECT * FROM {$this->getTableName()} ORDER BY 1 DESC LIMIT {$start} , {$limit} ");
+        }
         public function __call($method , $args){
             
             if ( stristr($method , 'findBy') ) {
