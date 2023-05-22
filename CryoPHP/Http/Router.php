@@ -22,6 +22,11 @@
             }
             $controllers = [];
             foreach($this->getAppClasses() as $className) {
+                
+                if ( method_exists($className , 'flagInstaller') ) {
+                    $inst = new $className();
+                }
+                
                 if ( method_exists($className , 'flagController') ) {
                     $controllers[] = $className;
                 }
@@ -29,9 +34,7 @@
             }
 
             foreach($controllers as $controller){
-                if ( method_exists($className , 'flagInstaller') ) {
-                    $inst = new $className();
-                } else if ( method_exists($controller , 'flagLoadBalancer') ) {
+                if ( method_exists($controller , 'flagLoadBalancer') ) {
                     $inst = new $controller();
                     $inst->index();
                 } else if ( method_exists($controller , 'flagReactApp' )) {
