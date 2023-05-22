@@ -45,7 +45,7 @@
             $file = glob($path);
 
             if ( count($file) < 1 ) {
-                throw new \Exception("Cannot find class file: $classFile");
+                throw new \Exception("Cannot find class file: $className");
             }
             if ( stristr($className , '.yaml') || stristr($className , '.yml') ) {
                 //need to implement this
