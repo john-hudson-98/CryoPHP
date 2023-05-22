@@ -29,11 +29,11 @@
                 }
                 $query = @$config['query'];
 
-                foreach($config['arguments'] as $argName => $data){
+                foreach(@$config['arguments'] ?? [] as $argName => $data){
                     $query = str_replace(':' . $argName , '{$' . $argName . '}' , $query);
                 }
 
-                $classBuilder->addMethod($methodName , $arguments , "\t\theader(\"Content-Type: application/json\");\n\t\t\$db = \\{$definition['adapter']}::Get();\n\t\t\treturn die(json_encode(\$db->query(\"{$query}\")));\n" , 'array' , false);
+                $classBuilder->addMethod($methodName , $arguments , "\t\theader(\"Content-Type: application/json\");\n\t\t\$db = \\{$definition['adapter']}::Get();\n\t\t\t\$res = \$db->query(\"{$query}\"); if ( count(\$res) == 1 && count(array_keys(\$res[0])) == 1 ) { die(json_encode(\$res[0])); }else{ die(json_encode(\$res)); } \n" , 'array' , false);
             }
             $classBuilder->addMethod("GetRoutes" , [] ,  "\t\treturn json_decode('" . json_encode($routes) . "' , true);\n" , 'array' , true);
             
