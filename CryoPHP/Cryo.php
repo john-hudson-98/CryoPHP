@@ -41,7 +41,12 @@
         }
         private static function loadAppClass($className) {
             $path = 'src/' . substr($className , 4) . '.*';
+            
             $file = glob($path);
+
+            if ( count($file) < 1 ) {
+                throw new \Exception("Cannot find class file: $classFile");
+            }
             if ( stristr($className , '.yaml') || stristr($className , '.yml') ) {
                 //need to implement this
             } else {
