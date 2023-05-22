@@ -58,7 +58,6 @@
             );
             return $this;
         }
-        
         public function toSource(){
             $out = '<?php' . PHP_EOL . PHP_EOL;
 

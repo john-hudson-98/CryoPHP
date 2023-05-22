@@ -43,6 +43,7 @@
                 $methodBody .= "\n\t\t\t)\");\n";
 
                 $classBuilder->addMethod('install_' . $table['table'] , [] , $methodBody , 'void' , false);
+                $classBuilder->addMethod('flagInstaller' , [] , '' , 'void' , true);
 
             }
 
