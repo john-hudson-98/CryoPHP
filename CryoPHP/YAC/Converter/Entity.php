@@ -15,7 +15,7 @@
                     $classBuilder->addMethod('set' . ucfirst($name) , ['$value'] , "\t\t\$this->{$name} = \$value;\n" , 'void' , false);
                 }
                 if ( in_array('get' , @$conf['def']) ) {
-                    $classBuilder->addMethod('get' . ucfirst($name) , [] , "\t\treturn \$this->{$name};\n" , $conf['type'] , false);
+                    $classBuilder->addMethod('get' . ucfirst($name) , [] , "\t\treturn \$this->{$name};\n" , '?' . $conf['type'] , false);
                 }
             }
 

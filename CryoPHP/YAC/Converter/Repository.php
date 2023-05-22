@@ -31,8 +31,15 @@
                             }
                         }
                     }
-                    
-                    $classBuilder->addMethod($methodName , $argNames , "\t\treturn \$this->getDbAdapter()->query(\"{$query}\");\n" , '?array' , false);
+                    if ( @$props['return'] ) {
+                        if ( $props['return'] == 'int' ) {
+                            $classBuilder->addMethod($methodName , $argNames , "\t\t\$resp = \$this->getDbAdapter()->query(\"{$query}\");\n\t\tif ( @\$resp[0] ) { return array_values(@\$resp[0])[0]; } else { return 0; } " , '?' . $props['return'] , false);
+                        } else {
+                            $classBuilder->addMethod($methodName , $argNames , "\t\treturn \$this->getDbAdapter()->query(\"{$query}\");\n" , '?' . $props['return'] , false);
+                        }
+                    } else {
+                        $classBuilder->addMethod($methodName , $argNames , "\t\treturn \$this->getDbAdapter()->query(\"{$query}\");\n" , '?array' , false);
+                    }
                 }
             }
 

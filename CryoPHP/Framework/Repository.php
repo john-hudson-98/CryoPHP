@@ -18,6 +18,48 @@
                 return $this->getDbAdapter()->query($query , array($attrName => $args[0]));
             }
 
+            if ( $method == 'save' ) {
+                //save entity
+
+                $schema = [];
+                $path = str_replace('\\' , '/' , str_replace('App\\' , 'src/' , get_class($args[0])));
+
+                $match = glob($path . ".*");
+
+                if ( count($match) < 1 ) {
+                    throw new \Exception("Either Entity doesn't exist, or the path cannot be found");
+                }
+                $entity = \spyc_load_file($match[0]);
+
+                $query = "INSERT INTO {$this->getTableName()} ( \n";
+
+                $i = 0;
+                foreach($entity['properties'] as $propertyName => $data){
+                    $query .= ($i > 0 ? " , \n\t" : "\t") . $data['column'];
+                    $i++;
+                }
+
+                $query .= "\n) VALUES (\n";
+                $i = 0;
+                foreach($entity['properties'] as $propertyName => $data){
+                    $query .= ($i > 0 ? " , \n\t" : "\t") . '?';
+                    $i++;
+                }
+                $query .= "\n)";
+
+                $values = [];
+                $reflection = new \ReflectionClass(get_class($args[0]));
+                foreach($entity['properties'] as $propertyName => $data){
+                    $values[] = $reflection->getProperty($propertyName)->getValue($args[0]);
+                }
+
+                $this->getDbAdapter()->query($query , $values);
+                return $this;
+            }
+
+
+            throw new \Exception("Unknown Method: {$method} on " . get_class($this));
+
         }
     }
 
