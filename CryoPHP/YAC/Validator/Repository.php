@@ -11,9 +11,6 @@
             if ( !@$definition['meta']['table'] ) {
                 throw new \Exception("YACValidationException - Entity musts have a meta property containing the children `table`,`install` and `entity`");
             }
-            if ( !@$definition['meta']['install'] ) {
-                throw new \Exception("YACValidationException - Entity musts have a meta property containing the children `table`,`install` and `entity`");
-            }
             if ( !@$definition['meta']['entity'] ) {
                 throw new \Exception("YACValidationException - Entity musts have a meta property containing the children `table`,`install` and `entity`");
             }
