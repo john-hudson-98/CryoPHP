@@ -22,21 +22,40 @@
                     'call' => $methodName
                 );
                 $arguments = [];
+                $binds = [];
                 if ( @$config['arguments'] ) {
                     foreach($config['arguments'] as $name => $cfg){
                         $arguments[] = (@$cfg['type'] ? $cfg['type'] . ' $' : '$') . $name . (@$cfg['default'] !== null ? ' = ' . @$cfg['default'] : '');
+                        $binds[] = '$' . $name;
                     }
                 }
-                $query = @$config['query'];
+                if ( @$config['query'] ) {
+                    $query = @$config['query'];
 
-                foreach(@$config['arguments'] ?? [] as $argName => $data){
-                    $query = str_replace(':' . $argName , '{$' . $argName . '}' , $query);
+                    foreach(@$config['arguments'] ?? [] as $argName => $data){
+                        $query = str_replace(':' . $argName , '?' , $query);
+                    }
+                    $varAssignment = "\t\t\$route = explode(\"/\" , \"{$config['match']['path']}\");\n";
+                    $varBinds = "\t\$binds = [];\n";
+                    $varBinds .= "\t\t\tforeach(\$route as \$idx => \$path){\n";
+                    $varBinds .= "\t\t\t\tif(@\$path[0] == '{'){\n";
+                    $varBinds .= "\t\t\t\t\t\$binds[] = array('var' => str_replace(['{' , '}'] , '' , \$path) , 'value' => explode('/' , \$_SERVER['REQUEST_URI'])[\$idx]);\n";
+                    $varBinds .= "\t\t\t\t}\n";
+                    $varBinds .= "\t\t\t}\n";
+                    $varBinds .= "\t\t\t\$prep = [];\n";
+                    $varBinds .= "\t\t\tforeach(\$binds as \$bind){\n";
+                    $varBinds .= "\t\t\t\t\$prep[] = \$bind['value'];\n";
+                    $varBinds .= "\t\t\t}\n";
+                    // $varBinds
+                    
+                    
+                    $classBuilder->addMethod($methodName , $arguments , "{$varAssignment}\t\t{$varBinds}\t\t\theader(\"Content-Type: application/json\");\n\t\t\t\$db = \\{$definition['adapter']}::Get();\n\t\t\t\$res = \$db->query(\"{$query}\" , \$prep); if ( count(\$res) == 1 && count(array_keys(\$res[0])) == 1 ) { die(json_encode(\$res[0])); }else{ die(json_encode(\$res)); } \n" , 'array' , false);
                 }
-
-                $classBuilder->addMethod($methodName , $arguments , "\t\theader(\"Content-Type: application/json\");\n\t\t\$db = \\{$definition['adapter']}::Get();\n\t\t\t\$res = \$db->query(\"{$query}\"); if ( count(\$res) == 1 && count(array_keys(\$res[0])) == 1 ) { die(json_encode(\$res[0])); }else{ die(json_encode(\$res)); } \n" , 'array' , false);
             }
             $classBuilder->addMethod("GetRoutes" , [] ,  "\t\treturn json_decode('" . json_encode($routes) . "' , true);\n" , 'array' , true);
             
+            // die('<pre>' . htmlentities($classBuilder->toSource()));
+
             return $classBuilder;
         
         }

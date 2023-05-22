@@ -71,6 +71,8 @@
             
             $path = explode("/" , $url);
             $routeItems = explode("/" , $route);
+            // echo '<pre>';
+            // var_dump($path , $routeItems);
             $invalid = false;
             if ( count($path) !== count($routeItems) ) {
                 return false;
@@ -80,6 +82,9 @@
                     if ( $routeItems[$i] == '*' ) {
                         continue;
                     } 
+                    if ( @$routeItems[$i][0] == '{' ) {
+                        continue;
+                    }
                     if ( $routeItems[$i] == $path[$i] ) {
                         continue;
                     }
