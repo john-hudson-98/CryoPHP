@@ -57,7 +57,7 @@
             }
             if ( $fallbackDefinition ) {
                 // load fallback
-                $this->dispatchRouter($definition);
+                $this->dispatchRouter($fallbackDefinition);
             }
         }
         private function dispatchRouter($definition){
@@ -68,6 +68,7 @@
                     if ( @$definition['subType'] == 'React' ) {
                         $react = new ReactRouter();
                         $react->serveApp($server['url'] , $server['app_name'] , $_SERVER['REQUEST_URI']);
+                        
                         die();
                     } else {
                         // sort this when it gets to it
@@ -81,12 +82,16 @@
                                 header("Content-Type: application/json");
                                 die($this->executeShortcode(@$route['response']));
                             }
+                            if ( @$route['action'] ) {
+                                header("Content-Type: application/json");
+                                include_once('src/actions/' . $_SERVER['SERVER_NAME'] . '/' . $route['action']);
+                                die();
+                            }
                         }
                     }
                 }
             } else {
                 //route on method.
-                
             }
         }
         private function executeShortcode($response){
