@@ -11,12 +11,17 @@
         public function cacheExistsNoType($filename){
             $cacheName = sha1($filename) . ".php";
             $cacheMatch = glob("var/cache/cryo/*/{$cacheName}");
+            if ( count($cacheMatch) < 1 ) {
+                return false;
+            }
             return count($cacheMatch) > 0 && (filemtime($filename) < filemtime($cacheMatch[0]));
         }
         public function load($filename){
             $cacheName = sha1($filename) . ".php";
             $item = glob("var/cache/cryo/*/{$cacheName}");
-
+            if ( count($item) < 1 ) {
+                throw new \Exception("Unknown file: $filename");
+            }
             require_once($item[0]);
         }
         public function cacheValid($filename , $type = 'object') {

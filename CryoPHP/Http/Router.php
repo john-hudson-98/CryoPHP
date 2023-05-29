@@ -4,65 +4,116 @@
 
     class Router {
 
+        private static $YAML_CLASSES = [];
+
         public function route($url , $config = null){
             $all = $this->getYamlFiles('src');
-            
-            $cache = new \Cryo\Core\CacheManager();
-            $loader = new \Cryo\YAC\Loader();
-            
-            foreach($all as $definition) {
-                ## THIS CURRENTLY DOESN'T WORK CORRECTLY, IT DOESN'T SHOW WHATS THE MOST
-                ## RECENT FILE, KEEPING IT LIKE THIS FOR DEVELOPMENT PURPOSES
-                if ( $cache->cacheExistsNoType($definition) ) {
-                    $cache->load($definition);   
-                } else {
-                    $loader->load($definition);
-                    $cache->load($definition);   
-                }
-            }
-            $controllers = [];
-            foreach($this->getAppClasses() as $className) {
-                
-                if ( method_exists($className , 'flagInstaller') ) {
-                    $inst = new $className();
-                }
-                
-                if ( method_exists($className , 'flagController') ) {
-                    $controllers[] = $className;
-                }
-                
-            }
+            $fallbackDefinition = null;
 
-            foreach($controllers as $controller){
-                if ( method_exists($controller , 'flagLoadBalancer') ) {
-                    $inst = new $controller();
-                    $inst->index();
-                } else if ( method_exists($controller , 'flagReactApp' )) {
-                    // check whether a URL starts with 
-                    $_url = array_keys($controller::GetRoutes())[0];
+            foreach($all as $yaml){
+                $definition = spyc_load_file($yaml);
 
-                    if ( substr($url , 0 , strlen($_url)) == $_url ) {
-                        $this->dispatch($url , ['call' => 'index' , 'methods' => 'GET,OPTIONS'] , $controller);
+                if ( @$definition['type'] !== 'Controller' ) {
+                    continue;
+                }
+
+                self::$YAML_CLASSES[] = $definition;
+                //why re read them?
+
+                if ( @$definition['isFallback'] ) {
+                    $fallbackDefinition = $definition;
+                }
+
+                if ( @$definition['isMultiTenant'] ) {
+                    //route from a website level instead.
+                    foreach((@$definition['websites'] ?? []) as $hostname => $config){
+                        if ( $_SERVER['SERVER_NAME'] == $hostname ) {
+                            if ( @$definition['isFallback'] ) {
+                                //if is fallback, we will launch the router 
+                                //further down the code.
+                                continue 2;
+                            } else {
+                                if ( @$definition['route'] ) {
+                                    $url = $definition['route'];
+
+                                    if ( $this->urlMatches($url , explode("?" , $_SERVER['REQUEST_URI'])[0]) ) {
+                                        $this->dispatchRouter($definition);
+                                    }
+                                } else {
+
+                                    foreach($config as $method => $route){
+                                        if ( $this->urlMatches($route['url'] , explode("?" , $_SERVER['REQUEST_URI'])[0]) ) {
+                                            $this->dispatchRouter($definition);
+                                            die();
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
-                    $routes = $controller::GetRoutes();
-                    foreach($routes as $path => $possibleRoutes) {
-                        if ( $this->urlMatches($path , $url) ) {
-                            $this->dispatch($path , $possibleRoutes , $controller);
-                            die();
+                    //route from a single level
+                }
+            }
+            if ( $fallbackDefinition ) {
+                // load fallback
+                $this->dispatchRouter($definition);
+            }
+        }
+        private function dispatchRouter($definition){
+            if ( @$definition['isMultiTenant'] ) {
+                $server = $definition['websites'][$_SERVER['SERVER_NAME']];
+                
+                if ( @$definition['isFallback'] ) {
+                    if ( @$definition['subType'] == 'React' ) {
+                        $react = new ReactRouter();
+                        $react->serveApp($server['url'] , $server['app_name'] , $_SERVER['REQUEST_URI']);
+                        die();
+                    } else {
+                        // sort this when it gets to it
+                    }
+                } else {
+                    foreach($server as $methodName => $route){
+                        if ( $this->urlMatches($route['url'] , explode("?" , $_SERVER['REQUEST_URI'])[0]) ) {
+                            //correct route
+                            if ( @$route['response'] ) {
+                                // shortcut code.
+                                header("Content-Type: application/json");
+                                die($this->executeShortcode(@$route['response']));
+                            }
                         }
                     }
                 }
+            } else {
+                //route on method.
+                
             }
+        }
+        private function executeShortcode($response){
 
-            if ( $config ) {
-                if ( isset($config['fallbackController']) ) {
-                    $inst = new $config['fallbackController']();
+            $out = [];
 
-                    $inst->{$config['fallbackMethod'] ?? "index"}();
+            foreach($response as $key => $code){
+                $parts = explode(":" , $code);
+
+                if ( @$parts[0] == 'php' ) {
+                    switch(@$parts[1]) {
+                        case "session":
+                            $operation = explode("(" , $parts[2]);
+                            $argument = $operation[1][0] == "'" || $operation[1][0] == '"' ? substr($operation[1] , 1 , strlen($operation[1]) - 3) : $operation[1];
+                            switch($operation[0]){
+                                case "has":
+                                    $out[$key] = isset($_SESSION[$argument]);
+                                break;
+                                case "get":
+                                    $out[$key] = $_SESSION[$argument];
+                                break;
+                            }
+                        break;
+                    }
                 }
             }
-            
+            return json_encode($out);
         }
         private function urlMatches($route , $url){
             if ( $url == $route ) {

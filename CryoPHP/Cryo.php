@@ -49,6 +49,7 @@
             }
             if ( stristr($className , '.yaml') || stristr($className , '.yml') ) {
                 //need to implement this
+                die($className);
             } else {
                 require_once($file[0]);
             }
