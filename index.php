@@ -7,6 +7,12 @@
 
     require_once('CryoPHP/Cryo.php');
     
-    Cryo::Application(json_decode(file_get_contents("cryo.config") , true));
+    $conf = [];
+
+    if ( file_exists("cryo.config") ) {
+        $conf = json_decode(file_get_contents("cryo.config") , true);
+    }
+
+    Cryo::Application($conf);
 
 ?>
