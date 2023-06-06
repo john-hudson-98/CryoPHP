@@ -92,6 +92,16 @@
                 }
             } else {
                 //route on method.
+                if ( @$definition['isFallback'] ) {
+                    if ( @$definition['subType'] == 'React' ) {
+                        $react = new ReactRouter();
+                        $react->serveApp($definition['app']['url'] , $definition['app']['app_name'] , $_SERVER['REQUEST_URI']);
+                        
+                        die();
+                    } else {
+                        // sort this when it gets to it
+                    }
+                }
             }
         }
         private function executeShortcode($response){
